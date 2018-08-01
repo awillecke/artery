@@ -1035,6 +1035,75 @@ constexpr ubyte VAR_SCREENSHOT = 0xa5;
 // track vehicle
 constexpr ubyte VAR_TRACK_VEHICLE = 0xa6;
 
+// get generic information
+constexpr ubyte VAR_GET_GENERIC_INFORMATION = 0xe9;
+
+// set generic information
+constexpr ubyte VAR_SET_GENERIC_INFORMATION = 0xea;
+
+// set CACC constant spacing
+constexpr ubyte VAR_SET_CACC_SPACING = 0xeb;
+
+// get CACC constant spacing
+constexpr ubyte VAR_GET_CACC_SPACING = 0xec;
+
+// get ACC computed acceleration when faked CACC controller is enabled
+constexpr ubyte VAR_GET_ACC_ACCELERATION = 0xed;
+
+// determine whether a vehicle has crashed or not
+constexpr ubyte VAR_GET_CRASHED = 0xee;
+
+// set a fixed acceleration to a vehicle controlled by CC/ACC/CACC
+constexpr ubyte VAR_SET_FIXED_ACCELERATION = 0xef;
+
+// get vehicle speed and acceleration, needed for example by the platoon leader (get: vehicle)
+constexpr ubyte VAR_GET_SPEED_AND_ACCELERATION = 0xf0;
+
+// set speed and acceleration of the platoon leader
+constexpr ubyte VAR_SET_LEADER_SPEED_AND_ACCELERATION = 0xf1;
+
+// get lane count for the street the vehicle is currently traveling
+constexpr ubyte VAR_GET_LANES_COUNT = 0xf2;
+
+// set the lane change action that the driver should perform as given by the platooning controller
+constexpr ubyte VAR_SET_LANE_CHANGE_ACTION = 0xf3;
+
+// set the cruise control desired speed
+constexpr ubyte VAR_SET_CC_DESIRED_SPEED = 0xf4;
+
+// set the currently active vehicle controller which can be either the driver, or the ACC or the CACC
+constexpr ubyte VAR_SET_ACTIVE_CONTROLLER = 0xf5;
+
+// get whether a cruise controller is installed in the car
+constexpr ubyte VAR_GET_CC_INSTALLED = 0xf6;
+
+// get radar data from the car
+constexpr ubyte VAR_GET_RADAR_DATA = 0xf7;
+
+// must always take into consideration both fake and real data
+constexpr ubyte VAR_SET_CONTROLLER_FAKE_DATA = 0xf8;
+
+// get the distance that a car has to travel until it reaches the end of its route
+constexpr ubyte VAR_GET_DISTANCE_TO_END = 0xf9;
+
+// get the current lane change action
+constexpr ubyte VAR_GET_LANE_CHANGE_ACTION = 0xfa;
+
+// get the currently active vehicle controller
+constexpr ubyte VAR_GET_ACTIVE_CONTROLLER = 0xfb;
+
+// get the distance from the beginning of the route
+constexpr ubyte VAR_GET_DISTANCE_FROM_BEGIN = 0xfc;
+
+// set speed and acceleration of the preceding vehicle
+constexpr ubyte VAR_SET_PREC_SPEED_AND_ACCELERATION = 0xfd;
+
+// set vehicle to move to a fixed lane
+constexpr ubyte VAR_SET_FIXED_LANE = 0xfe;
+
+// set ACC headway time
+constexpr ubyte VAR_SET_ACC_HEADWAY_TIME = 0xff;
+
 
 } // namespace constants
 } // namespace traci

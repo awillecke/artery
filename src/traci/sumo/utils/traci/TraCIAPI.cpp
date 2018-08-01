@@ -2736,6 +2736,304 @@ TraCIAPI::VehicleScope::setEmissionClass(const std::string& vehicleID, const std
 }
 
 
+void
+TraCIAPI::VehicleScope::getVehicleData(const std::string& vehicleID, double &speed, double &acceleration, double &controllerAcceleration, double &positionX, double &positionY, double &time) const {
+    //INFO: This function is quite inconsistent (missing types), but matches the implementation of Plexe-Sumo
+    //TODO: Maybe rewrite this function on both sides
+
+    myParent.send_commandGetVariable(CMD_GET_VEHICLE_VARIABLE, VAR_GET_SPEED_AND_ACCELERATION, vehicleID);
+
+    tcpip::Storage inMsg;
+
+    myParent.processGET(inMsg, CMD_GET_VEHICLE_VARIABLE, -1);
+    inMsg.readUnsignedByte(); // variableID
+    inMsg.readString(); // objectID
+
+    // read variable
+    if (inMsg.readUnsignedByte() != TYPE_DOUBLE) {
+        throw tcpip::SocketException("VAR_GET_SPEED_AND_ACCELERATION (speed) needs type double, is type ");
+    }
+    speed = inMsg.readDouble();
+
+    if (inMsg.readUnsignedByte() != TYPE_DOUBLE) {
+        throw tcpip::SocketException("VAR_GET_SPEED_AND_ACCELERATION (acceleration) needs type double");
+    }
+    acceleration = inMsg.readDouble();
+    controllerAcceleration = inMsg.readDouble();
+    positionX = inMsg.readDouble();
+    positionY = inMsg.readDouble();
+    time = inMsg.readDouble();
+}
+
+
+void
+TraCIAPI::VehicleScope::setGenericInformation(const std::string& vehicleID, int type, const void* data, int length) const {
+    //INFO: In Plexe-Sumo, type and length are read directly read into a struct Plexe::CCDataHeader and a char []
+    //TODO: Maybe rewrite this function on both sides
+
+    short a = 0x0102;
+    unsigned char *p_a = reinterpret_cast<unsigned char*>(&a);
+    bool bigEndian_ = (p_a[0] == 0x01); // big endian?
+
+    tcpip::Storage content;
+    content.writeInt(length);
+    content.writeInt(type);
+    if (bigEndian_) {
+        for (size_t i=0; i<length; ++i) {
+            content.writeUnsignedByte(*((uint8_t *)data+i));
+        }
+    } else {
+        for (size_t i=0; i<length; ++i) {
+            content.writeUnsignedByte(*((uint8_t *)data+length-1-i));
+        }
+    }
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_GENERIC_INFORMATION, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+}
+
+
+void
+TraCIAPI::VehicleScope::getGenericInformation(const std::string& vehicleID, int type, const void* params, int paramsLength, void *result) const {
+    //TODO: Maybe rewrite this function on both sides
+
+    short a = 0x0102;
+    unsigned char *p_a = reinterpret_cast<unsigned char*>(&a);
+    bool bigEndian_ = (p_a[0] == 0x01); // big endian?
+
+    tcpip::Storage content;
+    content.writeInt(paramsLength);
+    content.writeInt(type);
+    if (bigEndian_) {
+        for (size_t i=0; i<paramsLength; ++i) {
+            content.writeUnsignedByte(*((uint8_t *)params+i));
+        }
+    } else {
+        for (size_t i=0; i<paramsLength; ++i) {
+            content.writeUnsignedByte(*((uint8_t *)params+paramsLength-1-i));
+        }
+    }
+    myParent.send_commandSetValue(CMD_GET_VEHICLE_VARIABLE, VAR_GET_GENERIC_INFORMATION, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.processGET(inMsg, CMD_GET_VEHICLE_VARIABLE, -1);
+    inMsg.readUnsignedByte(); // variableID
+    inMsg.readString(); // objectID
+
+    int length = inMsg.readInt();
+
+    if (inMsg.readInt() != type) {
+        std::cout << "VAR_GET_GENERIC_INFORMATION received unrequested type" << std::endl;
+    }
+
+    if (bigEndian_) {
+        for (size_t i=0; i<length; ++i) {
+            *((uint8_t *)result+i) = inMsg.readUnsignedByte();
+        }
+    } else {
+        for (size_t i=0; i<length; ++i) {
+            *((uint8_t *)result+length-1-i) = inMsg.readUnsignedByte();
+        }
+    }
+}
+
+
+double
+TraCIAPI::VehicleScope::getACCAcceleration(const std::string& vehicleID) const {
+    return myParent.getDouble(CMD_GET_VEHICLE_VARIABLE, VAR_GET_ACC_ACCELERATION, vehicleID);
+}
+
+
+void
+TraCIAPI::VehicleScope::setPlatoonLeaderData(const std::string& vehicleID, double speed, double acceleration, double positionX, double positionY, double time) const {
+    tcpip::Storage content;
+    content.writeDouble(speed);
+    content.writeDouble(acceleration);
+    content.writeDouble(positionX);
+    content.writeDouble(positionY);
+    content.writeDouble(time);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_LEADER_SPEED_AND_ACCELERATION, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+}
+
+
+void
+TraCIAPI::VehicleScope::setPrecedingVehicleData(const std::string& vehicleID, double speed, double acceleration, double positionX, double positionY, double time) const {
+    tcpip::Storage content;
+    content.writeDouble(speed);
+    content.writeDouble(acceleration);
+    content.writeDouble(positionX);
+    content.writeDouble(positionY);
+    content.writeDouble(time);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_PREC_SPEED_AND_ACCELERATION, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+}
+
+
+unsigned int
+TraCIAPI::VehicleScope::getLanesCount(const std::string& vehicleID) const {
+    return myParent.getInt(CMD_GET_VEHICLE_VARIABLE, VAR_GET_LANES_COUNT, vehicleID);
+}
+
+
+void
+TraCIAPI::VehicleScope::setCruiseControlDesiredSpeed(const std::string& vehicleID, double desiredSpeed) const {
+    tcpip::Storage content;
+    content.writeDouble(desiredSpeed);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_CC_DESIRED_SPEED, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+
+}
+
+
+void
+TraCIAPI::VehicleScope::setActiveController(const std::string& vehicleID, int activeController) const {
+    tcpip::Storage content;
+    content.writeInt(activeController);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_ACTIVE_CONTROLLER, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+}
+
+int
+TraCIAPI::VehicleScope::getActiveController(const std::string& vehicleID) const {
+    return myParent.getInt(CMD_GET_VEHICLE_VARIABLE, VAR_GET_ACTIVE_CONTROLLER, vehicleID);
+}
+
+
+void
+TraCIAPI::VehicleScope::setCACCConstantSpacing(const std::string& vehicleID, double spacing) const {
+    tcpip::Storage content;
+    content.writeDouble(spacing);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_CACC_SPACING, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+}
+
+
+double
+TraCIAPI::VehicleScope::getCACCConstantSpacing(const std::string& vehicleID) const {
+    return myParent.getDouble(CMD_GET_VEHICLE_VARIABLE, VAR_GET_CACC_SPACING, vehicleID);
+}
+
+
+void
+TraCIAPI::VehicleScope::setACCHeadwayTime(const std::string& vehicleID, double headway) const {
+    tcpip::Storage content;
+    content.writeDouble(headway);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_ACC_HEADWAY_TIME, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+
+}
+
+
+void
+TraCIAPI::VehicleScope::setFixedAcceleration(const std::string& vehicleID, int activate, double acceleration) const {
+    tcpip::Storage content;
+    content.writeInt(activate);
+    content.writeDouble(acceleration);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_FIXED_ACCELERATION, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+}
+
+bool
+TraCIAPI::VehicleScope::isCrashed(const std::string& vehicleID) const {
+    return (bool)myParent.getUnsignedByte(CMD_GET_VEHICLE_VARIABLE, VAR_GET_CRASHED, vehicleID);
+}
+
+
+bool
+TraCIAPI::VehicleScope::isCruiseControllerInstalled(const std::string& vehicleID) const {
+    return (bool)myParent.getUnsignedByte(CMD_GET_VEHICLE_VARIABLE, VAR_GET_CC_INSTALLED, vehicleID);
+}
+
+
+void
+TraCIAPI::VehicleScope::setLaneChangeAction(const std::string& vehicleID, int action) const {
+    tcpip::Storage content;
+    content.writeInt(action);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_LANE_CHANGE_ACTION, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+
+}
+
+
+int
+TraCIAPI::VehicleScope::getLaneChangeAction(const std::string& vehicleID) const {
+    return myParent.getInt(CMD_GET_VEHICLE_VARIABLE, VAR_GET_LANE_CHANGE_ACTION, vehicleID);
+}
+
+
+void
+TraCIAPI::VehicleScope::setFixedLane(const std::string& vehicleID, int laneIndex) const {
+    tcpip::Storage content;
+    content.writeInt(laneIndex);
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_FIXED_LANE, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+
+}
+
+
+void
+TraCIAPI::VehicleScope::getRadarMeasurements(const std::string& vehicleID, double &distance, double &relativeSpeed) const {
+    myParent.send_commandGetVariable(CMD_GET_VEHICLE_VARIABLE, VAR_GET_RADAR_DATA, vehicleID);
+
+    tcpip::Storage inMsg;
+    myParent.processGET(inMsg, CMD_GET_VEHICLE_VARIABLE, -1);
+    inMsg.readUnsignedByte(); // variableID
+    inMsg.readString(); // objectID
+
+    if (inMsg.readUnsignedByte() != TYPE_DOUBLE) {
+        throw tcpip::SocketException("VAR_GET_RADAR_DATA (distance) needs type double");
+    }
+    distance = inMsg.readDouble();
+
+    if (inMsg.readUnsignedByte() != TYPE_DOUBLE) {
+        throw tcpip::SocketException("VAR_GET_RADAR_DATA (relativeSpeed) needs type double");
+    }
+    relativeSpeed = inMsg.readDouble();
+}
+
+
+void
+TraCIAPI::VehicleScope::setControllerFakeData(const std::string& vehicleID, double frontDistance, double frontSpeed, double frontAcceleration,
+        double leaderSpeed, double leaderAcceleration) const {
+    tcpip::Storage content;
+
+    content.writeDouble(frontDistance);
+    content.writeDouble(frontSpeed);
+    content.writeDouble(frontAcceleration);
+    content.writeDouble(leaderSpeed);
+    content.writeDouble(leaderAcceleration);
+
+    myParent.send_commandSetValue(CMD_SET_VEHICLE_VARIABLE, VAR_SET_CONTROLLER_FAKE_DATA, vehicleID, content);
+    tcpip::Storage inMsg;
+    myParent.check_resultState(inMsg, CMD_SET_VEHICLE_VARIABLE);
+}
+
+double
+TraCIAPI::VehicleScope::getDistanceFromRouteBegin(const std::string& vehicleID) const {
+    return myParent.getDouble(CMD_GET_VEHICLE_VARIABLE, VAR_GET_DISTANCE_FROM_BEGIN, vehicleID);
+}
+
+
+double
+TraCIAPI::VehicleScope::getDistanceToRouteEnd(const std::string& vehicleID) const {
+    return myParent.getDouble(CMD_GET_VEHICLE_VARIABLE, VAR_GET_DISTANCE_TO_END, vehicleID);
+}
+
+std::string
+TraCIAPI::VehicleScope::getVType(const std::string& vehicleID) const {
+    return myParent.getString(CMD_GET_VEHICLE_VARIABLE, VAR_TYPE, vehicleID);
+}
+
+
 // ---------------------------------------------------------------------------
 // // TraCIAPI::PersonScope-methods
 //  ---------------------------------------------------------------------------

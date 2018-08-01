@@ -733,6 +733,156 @@ public:
         void setMaxSpeed(const std::string& vehicleID, double speed) const;
         /// @}
 
+        /// @name vehicle platooning sumo interaction
+        /// @{
+        /**
+         * Gets the total number of lanes on the edge the vehicle is currently traveling
+         */
+        unsigned int getLanesCount(const std::string& vehicleID) const;
+        /**
+         * Sets the data about the leader of the platoon. This data is usually received
+         * by means of wireless communications
+         */
+        void setPlatoonLeaderData(const std::string& vehicleID, double leaderSpeed, double leaderAcceleration, double positionX, double positionY, double time) const;
+        /**
+         * Sets the data about the preceding vehicle in the platoon. This data is usually
+         * received by means of wireless communications
+         */
+        void setPrecedingVehicleData(const std::string& vehicleID, double speed, double acceleration, double positionX, double positionY, double time) const;
+        /**
+         * Gets the data about a vehicle. This can be used by a platoon leader in order to query for the acceleration
+         * before sending the data to the followers
+         */
+        void getVehicleData(const std::string& vehicleID, double &speed, double &acceleration, double &controllerAcceleration, double &positionX, double &positionY, double &time) const;
+
+        void setGenericInformation(const std::string& vehicleID, int type, const void* data, int length) const;
+        void getGenericInformation(const std::string& vehicleID, int type, const void* params, int paramsLength, void *result) const;
+
+        /**
+         * Set the cruise control desired speed
+         */
+        void setCruiseControlDesiredSpeed(const std::string& vehicleID, double desiredSpeed) const;
+        /**
+         * Set the currently active controller, which can be either the driver, the ACC or
+         * the CACC. CC is not mentioned because CC and ACC work together
+         *
+         * @param vehicleId the id of vehicle for which the active controller must be set
+         * @param activeController the controller to be activated: 0 for driver, 1 for
+         * ACC and 2 for CACC
+         */
+        void setActiveController(const std::string& vehicleID, int activeController) const;
+
+        /**
+         * Returns the currently active controller
+         */
+        int getActiveController(const std::string& vehicleID) const;
+        /**
+         * Set CACC constant spacing
+         *
+         * @param vehicleId the id of vehicle for which the constant spacing must be set
+         * @param spacing the constant spacing in meter
+         */
+        void setCACCConstantSpacing(const std::string& vehicleID, double spacing) const;
+
+        /**
+         * Returns the CACC constant spacing
+         */
+        double getCACCConstantSpacing(const std::string& vehicleID) const;
+
+        /**
+         * Sets the headway time for the ACC
+         *
+         * @param vehicleId the id of the vehicle
+         * @param headway the headway time in seconds
+         */
+        void setACCHeadwayTime(const std::string& vehicleID, double headway) const;
+
+        /**
+         * Enables/disables a fixed acceleration
+         *
+         * @param vehicleId the id of the vehicle
+         * @param activate activate (1) or deactivate (0) the usage of a fixed acceleration
+         * @param acceleration the fixed acceleration to be used if activate == 1
+         */
+        void setFixedAcceleration(const std::string& vehicleID, int activate, double acceleration) const;
+
+        /**
+         * Returns whether a vehicle has crashed or not
+         *
+         * @param vehicleId the id of the vehicle
+         * @return true if the vehicle has crashed, false otherwise
+         */
+        bool isCrashed(const std::string& vehicleID) const;
+
+        /**
+         * Tells whether the car has an ACC/CACC controller installed or not. Basically
+         * it checks the the mobility model which is driving the car
+         *
+         */
+        bool isCruiseControllerInstalled(const std::string& vehicleID) const;
+        /**
+         * Tells to the CC mobility model the desired lane change action to be performed
+         *
+         * @param vehicleId the vehicle id to communicate the action to
+         * @param action the action to be performed. this can be either:
+         * 0 = driver choice: the application protocol wants to let the driver chose the lane
+         * 1 = management lane: the application protocol wants the driver to move the car
+         * to the management lane, i.e., the leftmost minus one
+         * 2 = platooning lane: the application protocol wants the driver to move the car
+         * to the platooning lane, i.e., the leftmost
+         * 3 = stay there: the application protocol wants the driver to keep the car
+         * into the platooning lane because the car is a part of a platoon
+         */
+        void setLaneChangeAction(const std::string& vehicleID, int action) const;
+
+        /**
+         * Returns the currently set lane change action
+         */
+        int getLaneChangeAction(const std::string& vehicleID) const;
+
+        /**
+         * Set a fixed lane a car should move to
+         *
+         * @param laneIndex lane to move to, where 0 indicates the rightmost
+         */
+        void setFixedLane(const std::string& vehicleID, int laneIndex) const;
+
+        /**
+         * Gets the data measured by the radar, i.e., distance and relative speed.
+         * This is basically what SUMO measures, so it gives back potentially
+         * infinite distance measurements. Taking into account that the maximum
+         * distance measurable of the Bosch LRR3 radar is 250m, when this
+         * method returns a distance value greater than 250m, it shall be
+         * interpreted like "there is nobody in front"
+         */
+        void getRadarMeasurements(const std::string& vehicleID, double &distance, double &relativeSpeed) const;
+
+        void setControllerFakeData(const std::string& vehicleID, double frontDistance, double frontSpeed, double frontAcceleration,
+                double leaderSpeed, double leaderAcceleration) const;
+
+        /**
+         * Gets the distance that a vehicle has to travel to reach the end of
+         * its route. Might be really useful for deciding when a car has to
+         * leave a platoon
+         */
+        double getDistanceToRouteEnd(const std::string& vehicleID) const;
+
+        /**
+         * Gets the distance that a vehicle has traveled since the begin
+         */
+        double getDistanceFromRouteBegin(const std::string& vehicleID) const;
+
+        /**
+         * Gets acceleration that the ACC has computed while the vehicle
+         * is controlled by the faked CACC
+         */
+        double getACCAcceleration(const std::string& vehicleID) const;
+        /**
+         * Returns the vehicle type of a vehicle
+         */
+        std::string getVType(const std::string& vehicleID) const;
+        /// @}
+
     private:
         mutable SUMOTime LAST_TRAVEL_TIME_UPDATE;
 
