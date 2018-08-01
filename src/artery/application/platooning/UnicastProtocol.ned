@@ -15,9 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning;
+package artery.application.platooning;
 
-import org.car2x.veins.modules.application.ieee80211p.BaseWaveApplLayer;
+import artery.application.platooning.PlatooningBaseModule;
 
 //
 // This simple module implements a basic unicast (acknowledged)
@@ -34,7 +34,7 @@ import org.car2x.veins.modules.application.ieee80211p.BaseWaveApplLayer;
 // after a certain number of attempts, an error is communicated
 // to the upper layer.
 //
-simple UnicastProtocol extends BaseWaveApplLayer
+simple UnicastProtocol extends PlatooningBaseModule
 {
     parameters:
         //maximum queue size. set to 0 for infinite queue

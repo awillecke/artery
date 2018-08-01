@@ -97,3 +97,8 @@ endif()
 if(WITH_TESTBED)
     add_subdirectory(testbed)
 endif()
+
+if(WITH_PLATOONING)
+    add_subdirectory(application/platooning)
+endif()
+
