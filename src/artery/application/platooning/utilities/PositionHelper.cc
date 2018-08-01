@@ -15,7 +15,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/utilities/PositionHelper.h"
+#include "artery/application/platooning/utilities/PositionHelper.h"
 
 Define_Module(PositionHelper);
 

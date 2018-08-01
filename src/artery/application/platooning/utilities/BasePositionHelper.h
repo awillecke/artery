@@ -19,12 +19,11 @@
 #define BASEPOSITIONHELPER_H_
 
 #include <string>
-#include "veins/base/modules/BaseApplLayer.h"
-#include "veins/modules/mobility/traci/TraCIMobility.h"
+#include "artery/application/platooning/utilities/PlatooningBaseModule.h"
 
 #define INVALID_PLATOON_ID -99
 
-class BasePositionHelper : public BaseApplLayer
+class BasePositionHelper : public PlatooningBaseModule
 {
 
 	public:
@@ -169,10 +168,6 @@ class BasePositionHelper : public BaseApplLayer
 
 	protected:
 
-		Veins::TraCIMobility* mobility;
-		Veins::TraCICommandInterface *traci;
-		Veins::TraCICommandInterface::Vehicle *traciVehicle;
-
 		//id of this vehicle
 		int myId;
 		//number of lanes
@@ -198,9 +193,6 @@ class BasePositionHelper : public BaseApplLayer
 
 	public:
 		BasePositionHelper() {
-			mobility = 0;
-			traci = 0;
-			traciVehicle = 0;
 			myId = INVALID_PLATOON_ID;
 			nLanes = -1;
 			platoonSize = -1;

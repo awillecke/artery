@@ -6,8 +6,8 @@ add_artery_feature(platooningservice)
 
 # Now that all sources are ready, we can add them to the target
 target_sources(platooningservice PRIVATE
-	apps/BaseApp.cc
-	apps/SimplePlatooningApp.cc
+    apps/BaseApp.cc
+    apps/SimplePlatooningApp.cc
     protocols/BaseProtocol.cc
     protocols/SimplePlatooningBeaconing.cc
     protocols/SlottedBeaconing.cc

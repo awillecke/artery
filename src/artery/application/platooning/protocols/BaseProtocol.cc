@@ -15,19 +15,17 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/protocols/BaseProtocol.h"
-
-#include "veins/modules/mac/ieee80211p/Mac1609_4.h"
+#include "artery/application/platooning/protocols/BaseProtocol.h"
 
 Define_Module(BaseProtocol)
 
 //set signals for channel busy and collisions
-const simsignalwrap_t BaseProtocol::sigChannelBusy = simsignalwrap_t("sigChannelBusy");
-const simsignalwrap_t BaseProtocol::sigCollision = simsignalwrap_t("sigCollision");
+const simsignal_t BaseProtocol::sigChannelBusy = cComponent::registerSignal("sigChannelBusy");
+const simsignal_t BaseProtocol::sigCollision = cComponent::registerSignal("sigCollision");
 
 void BaseProtocol::initialize(int stage) {
 
-	BaseApplLayer::initialize(stage);
+	PlatooningBaseModule::initialize(stage);
 
 	if (stage == 0) {
 
@@ -47,10 +45,6 @@ void BaseProtocol::initialize(int stage) {
 		minUpperId = gate("upperLayerIn", 0)->getId();
 		maxUpperId = gate("upperLayerIn", MAX_GATES_COUNT - 1)->getId();
 
-		//get traci interface
-		mobility = Veins::TraCIMobilityAccess().get(getParentModule());
-		traci = mobility->getCommandInterface();
-		traciVehicle = mobility->getVehicleCommandInterface();
 		positionHelper = FindModule<BasePositionHelper*>::findSubModule(getParentModule());
 
 		//this is the id of the vehicle. used also as network address
@@ -93,8 +87,8 @@ void BaseProtocol::initialize(int stage) {
 		frontDelayOut.setName("frontDelay");
 
 		//subscribe to signals for channel busy state and collisions
-		findHost()->subscribe(sigChannelBusy, this);
-		findHost()->subscribe(sigCollision, this);
+		subscribe(sigChannelBusy, this);
+		subscribe(sigCollision, this);
 
 		//init statistics collection. round to second
 		SimTime rounded = SimTime(floor(simTime().dbl() + 1), SIMTIME_S);
@@ -119,7 +113,7 @@ void BaseProtocol::finish() {
 		delete recordData;
 		recordData = 0;
 	}
-	BaseApplLayer::finish();
+	PlatooningBaseModule::finish();
 }
 
 void BaseProtocol::handleSelfMsg(cMessage *msg) {
@@ -161,21 +155,18 @@ void BaseProtocol::sendPlatooningMessage(int destinationAddress) {
 	UnicastMessage *unicast;
 	PlatooningBeacon *pkt;
 	//get information about the vehicle via traci
-	traciVehicle->getVehicleData(speed, acceleration, controllerAcceleration, sumoPosX, sumoPosY, sumoTime);
+	service->getVehicleData(speed, acceleration, controllerAcceleration, sumoPosX, sumoPosY, sumoTime);
 	//get current vehicle position
-	Coord veinsPosition = mobility->getPositionAt(simTime());
-	//transform veins position into sumo position
-	Veins::TraCICoord coords = mobility->getManager()->omnet2traci(veinsPosition);
-	double veinsTime = simTime().dbl();
+	Position position = service->getCurrentPosition();
 
-	Coord position(coords.x, coords.y, 0);
+	double veinsTime = simTime().dbl();
 	double time = veinsTime;
 
 	//create and send beacon
 	unicast = new UnicastMessage("", BEACON_TYPE);
 	unicast->setDestination(-1);
 	unicast->setPriority(priority);
-	unicast->setChannel(Channels::CCH);
+	unicast->setChannel(0);
 
 	//create platooning beacon with data about the car
 	pkt = new PlatooningBeacon();
@@ -187,8 +178,8 @@ void BaseProtocol::sendPlatooningMessage(int destinationAddress) {
 	}
 	pkt->setSpeed(speed);
 	pkt->setVehicleId(myId);
-	pkt->setPositionX(position.x);
-	pkt->setPositionY(position.y);
+	pkt->setPositionX(position.x.value());
+	pkt->setPositionY(position.y.value());
 	//set the time to now
 	pkt->setTime(time);
 	//i generated the message, i send it
@@ -286,7 +277,7 @@ void BaseProtocol::handleMessage(cMessage *msg) {
 	if (msg->getArrivalGateId() >= minUpperId && msg->getArrivalGateId() <= maxUpperId)
 		handleUpperMsg(msg);
 	else
-		BaseApplLayer::handleMessage(msg);
+		PlatooningBaseModule::handleMessage(msg);
 }
 
 void BaseProtocol::handleLowerMsg(cMessage *msg) {

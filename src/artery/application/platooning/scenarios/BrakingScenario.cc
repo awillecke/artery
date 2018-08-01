@@ -15,7 +15,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/scenarios/BrakingScenario.h"
+#include "artery/application/platooning/scenarios/BrakingScenario.h"
 
 Define_Module(BrakingScenario);
 
@@ -46,12 +46,12 @@ void BrakingScenario::initialize(int stage) {
 				scheduleAt(startBraking, changeSpeed);
 			}
 			//set base cruising speed
-			traciVehicle->setCruiseControlDesiredSpeed(leaderSpeed);
+			service->setCruiseControlDesiredSpeed(leaderSpeed);
 		}
 		else {
 			//let the follower set a higher desired speed to stay connected
 			//to the leader when it is accelerating
-			traciVehicle->setCruiseControlDesiredSpeed(leaderSpeed + 10);
+			service->setCruiseControlDesiredSpeed(leaderSpeed + 10);
 		}
 
 	}
@@ -67,5 +67,5 @@ void BrakingScenario::finish() {
 void BrakingScenario::handleSelfMsg(cMessage *msg) {
 	BaseScenario::handleSelfMsg(msg);
 	if (msg == changeSpeed)
-		traciVehicle->setFixedAcceleration(1, -brakingDeceleration);
+		service->setFixedAcceleration(1, -brakingDeceleration);
 }

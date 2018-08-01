@@ -18,12 +18,12 @@
 #ifndef UNICASTPROTOCOL_H_
 #define UNICASTPROTOCOL_H_
 
-#include "veins/modules/application/ieee80211p/BaseWaveApplLayer.h"
+#include "artery/application/platooning/utilities/PlatooningBaseModule.h"
 
 #include <queue>
 
-#include "veins/modules/application/platooning/messages/UnicastMessage_m.h"
-#include "veins/modules/application/platooning/messages/UnicastProtocolControlMessage_m.h"
+#include "artery/application/platooning/messages/UnicastMessage_m.h"
+#include "artery/application/platooning/messages/UnicastProtocolControlMessage_m.h"
 
 enum ControlMessageCommand
 {
@@ -39,7 +39,7 @@ enum ControlMessageCommand
 	FULL_QUEUE
 };
 
-class UnicastProtocol : public BaseWaveApplLayer
+class UnicastProtocol : public PlatooningBaseModule
 {
 
 	protected:
@@ -96,10 +96,7 @@ class UnicastProtocol : public BaseWaveApplLayer
 	public:
 		virtual void initialize(int stage);
 		virtual void finish();
-
-	protected:
-		virtual void onBeacon(WaveShortMessage* wsm);
-		virtual void onData(WaveShortMessage* wsm);
+		void publicHandleLowerMsg(cMessage *msg);
 
 	protected:
 
@@ -137,7 +134,7 @@ class UnicastProtocol : public BaseWaveApplLayer
 		 * \param channel 0 for CCH, 1 for SCH
 		 * \param kind id of the application, for (de)multiplexing
 		 */
-		void sendMessageDown(int destination, cPacket *msg, int encapsulatedId, int priority, SimTime timestamp, enum Channels::ChannelNumber channel, short kind);
+		void sendMessageDown(int destination, cPacket *msg, int encapsulatedId, int priority, SimTime timestamp, short kind);
 
 		/**
 		 * Sends an ack in response to an unicast message

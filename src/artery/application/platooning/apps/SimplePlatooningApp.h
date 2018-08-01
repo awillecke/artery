@@ -18,7 +18,7 @@
 #ifndef SIMPLEPLATOONINGAPP_H_
 #define SIMPLEPLATOONINGAPP_H_
 
-#include "veins/modules/application/platooning/apps/BaseApp.h"
+#include "artery/application/platooning/apps/BaseApp.h"
 
 class SimplePlatooningApp : public BaseApp
 {
@@ -27,10 +27,6 @@ class SimplePlatooningApp : public BaseApp
 
 		virtual void initialize(int stage);
 		virtual void finish();
-
-	protected:
-		virtual void onBeacon(WaveShortMessage* wsm);
-		virtual void onData(WaveShortMessage* wsm);
 
 	public:
 		SimplePlatooningApp() {}

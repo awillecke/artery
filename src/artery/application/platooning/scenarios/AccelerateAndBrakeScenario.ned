@@ -15,9 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.scenarios;
+package artery.application.platooning.scenarios;
 
-import org.car2x.veins.modules.application.platooning.scenarios.BaseScenario;
+import artery.application.platooning.scenarios.BaseScenario;
 
 simple AccelerateAndBrakeScenario like BaseScenario
 {

@@ -18,7 +18,7 @@
 #ifndef POSITIONHELPER_H_
 #define POSITIONHELPER_H_
 
-#include "veins/modules/application/platooning/utilities/BasePositionHelper.h"
+#include "artery/application/platooning/utilities/BasePositionHelper.h"
 
 /**
  * Defines position utility functions for platoons organized in the following

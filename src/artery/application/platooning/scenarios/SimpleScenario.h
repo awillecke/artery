@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012-2016 Michele Segata <segata@ccs-labs.org>
+// Copyright (C) 2018 Alexander Willecke <willecke@ibr.cs.tu-bs.de>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,14 +15,15 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#ifndef BRAKINGSCENARIO_H_
-#define BRAKINGSCENARIO_H_
+#ifndef ACCELERATEANDBRAKESCENARIO_H_
+#define ACCELERATEANDBRAKESCENARIO_H_
 
 #include "artery/application/platooning/scenarios/BaseScenario.h"
 
 #include "artery/application/platooning/apps/BaseApp.h"
+#include "artery/application/platooning/PlatooningService.h"
 
-class BrakingScenario : public BaseScenario
+class SimpleScenario : public BaseScenario
 {
 
 	public:
@@ -32,23 +33,32 @@ class BrakingScenario : public BaseScenario
 
 	protected:
 
-		//leader average speed
-		double leaderSpeed;
-		//braking intensity in m/s/s
-		double brakingDeceleration;
-		//message used to tell the leader to start braking
-		cMessage *changeSpeed;
-		//start braking time
-		SimTime startBraking;
+//		//leader average speed
+//		double leaderSpeed;
+//		//acceleration in m/s/s
+//		double acceleration;
+//		//braking intensity in m/s/s
+//		double brakingDeceleration;
+//		//message used to tell the car to start accelerating
+//		cMessage *startAccelerationMsg;
+//		//message used to tell the car to start braking
+//		cMessage *startBrakingMsg;
+//		//start accelerating time
+//		SimTime startAccelerating;
+//		//start braking time
+//		SimTime startBraking;
 		//application layer, used to stop the simulation
 		BaseApp *appl;
 
 	public:
-		BrakingScenario() {
-			leaderSpeed = 0;
-			brakingDeceleration = 0;
-			changeSpeed = 0;
-			startBraking = SimTime(0);
+		SimpleScenario() {
+//			leaderSpeed = 0;
+//			acceleration = 0;
+//			brakingDeceleration = 0;
+//			startAccelerationMsg = 0;
+//			startBrakingMsg = 0;
+//			startAccelerating = SimTime(0);
+//			startBraking = SimTime(0);
 			appl = 0;
 		}
 

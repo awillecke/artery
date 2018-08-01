@@ -15,15 +15,15 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.protocols;
+package artery.application.platooning.protocols;
 
-import org.car2x.veins.base.modules.IBaseApplLayer;
+import artery.application.platooning.utilities.IPlatooningBaseModule;
 
 //
 // Define the base protocol for platooning. every improved
 // protocol must derive from this
 //
-moduleinterface BaseProtocol extends IBaseApplLayer
+moduleinterface BaseProtocol extends IPlatooningBaseModule
 {
 
     parameters:

@@ -15,9 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.protocols;
+package artery.application.platooning.protocols;
 
-import org.car2x.veins.modules.application.platooning.protocols.BaseProtocol;
+import artery.application.platooning.protocols.BaseProtocol;
 
 //
 // Define static beaconing for platooning

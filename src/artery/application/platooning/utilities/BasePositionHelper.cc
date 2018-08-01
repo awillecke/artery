@@ -15,18 +15,15 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/utilities/BasePositionHelper.h"
+#include "artery/application/platooning/utilities/BasePositionHelper.h"
 
 Define_Module(BasePositionHelper);
 
 void BasePositionHelper::initialize(int stage) {
 
-	BaseApplLayer::initialize(stage);
+	PlatooningBaseModule::initialize(stage);
 
 	if (stage == 0) {
-		mobility = Veins::TraCIMobilityAccess().get(getParentModule());
-		traci = mobility->getCommandInterface();
-		traciVehicle = mobility->getVehicleCommandInterface();
 		nLanes = par("nLanes").longValue();
 		platoonSize = par("platoonSize").longValue();
 		nCars = par("nCars").longValue();
@@ -36,11 +33,11 @@ void BasePositionHelper::initialize(int stage) {
 }
 
 void BasePositionHelper::finish() {
-	BaseApplLayer::finish();
+	PlatooningBaseModule::finish();
 }
 
 std::string BasePositionHelper::getExternalId() {
-	return mobility->getExternalId();
+	return service->getVehicleId();
 }
 
 int BasePositionHelper::getId() {

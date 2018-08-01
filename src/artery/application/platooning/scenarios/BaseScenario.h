@@ -18,15 +18,13 @@
 #ifndef BASESCENARIO_H_
 #define BASESCENARIO_H_
 
-#include "veins/base/modules/BaseApplLayer.h"
+#include "artery/application/platooning/utilities/PlatooningBaseModule.h"
 
-#include "veins/modules/mobility/traci/TraCIMobility.h"
+#include "artery/application/platooning/CC_Const.h"
 
-#include "veins/modules/application/platooning/CC_Const.h"
+#include "artery/application/platooning/utilities/BasePositionHelper.h"
 
-#include "veins/modules/application/platooning/utilities/BasePositionHelper.h"
-
-class BaseScenario : public BaseApplLayer
+class BaseScenario : public PlatooningBaseModule
 {
 
 	public:
@@ -35,11 +33,6 @@ class BaseScenario : public BaseApplLayer
 		virtual void finish();
 
 	protected:
-
-		//traci interfaces
-		Veins::TraCIMobility* mobility;
-		Veins::TraCICommandInterface *traci;
-		Veins::TraCICommandInterface::Vehicle *traciVehicle;
 
 		//determines position and role of each vehicle
 		BasePositionHelper *positionHelper;
@@ -72,9 +65,6 @@ class BaseScenario : public BaseApplLayer
 
 	public:
 		BaseScenario() {
-			mobility = 0;
-			traci = 0;
-			traciVehicle = 0;
 			positionHelper = 0;
 			useRealisticEngine = false;
 		}

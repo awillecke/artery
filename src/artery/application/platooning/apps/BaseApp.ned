@@ -15,11 +15,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.apps;
+package artery.application.platooning.apps;
 
-import org.car2x.veins.base.modules.IBaseApplLayer;
+import artery.application.platooning.utilities.IPlatooningBaseModule;
 
-moduleinterface BaseApp extends IBaseApplLayer
+moduleinterface BaseApp extends IPlatooningBaseModule
 {
     parameters:
         //duration of simulation

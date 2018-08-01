@@ -17,7 +17,7 @@
 
 package artery.application.platooning;
 
-import artery.application.platooning.PlatooningBaseModule;
+import artery.application.platooning.utilities.PlatooningBaseModule;
 
 //
 // This simple module implements a basic unicast (acknowledged)

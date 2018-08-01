@@ -18,20 +18,20 @@
 #ifndef BASEAPP_H_
 #define BASEAPP_H_
 
-#include "veins/base/modules/BaseApplLayer.h"
+#include "artery/application/platooning/utilities/PlatooningBaseModule.h"
 
-#include "veins/modules/application/platooning/UnicastProtocol.h"
-#include "veins/modules/application/platooning/messages/PlatooningBeacon_m.h"
+#include "artery/application/platooning/UnicastProtocol.h"
+#include "artery/application/platooning/messages/PlatooningBeacon_m.h"
 
-#include "veins/modules/mobility/traci/TraCIMobility.h"
+#include "artery/application/platooning/CC_Const.h"
 
-#include "veins/modules/application/platooning/CC_Const.h"
-
-#include "veins/modules/application/platooning/utilities/BasePositionHelper.h"
+#include "artery/application/platooning/utilities/BasePositionHelper.h"
 
 class BaseProtocol;
 
-class BaseApp : public BaseApplLayer
+using namespace omnetpp;
+
+class BaseApp : public PlatooningBaseModule
 {
 
 	public:
@@ -40,17 +40,9 @@ class BaseApp : public BaseApplLayer
 		virtual void finish();
 
 	protected:
-		virtual void onBeacon(WaveShortMessage* wsm);
-		virtual void onData(WaveShortMessage* wsm);
-
-	protected:
 
 		//id of this vehicle
 		int myId;
-
-		Veins::TraCIMobility* mobility;
-		Veins::TraCICommandInterface *traci;
-		Veins::TraCICommandInterface::Vehicle *traciVehicle;
 
 		//determines position and role of each vehicle
 		BasePositionHelper *positionHelper;

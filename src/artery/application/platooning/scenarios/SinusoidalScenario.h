@@ -18,7 +18,7 @@
 #ifndef SINUSOIDALSCENARIO_H_
 #define SINUSOIDALSCENARIO_H_
 
-#include "veins/modules/application/platooning/scenarios/BaseScenario.h"
+#include "artery/application/platooning/scenarios/BaseScenario.h"
 
 class SinusoidalScenario : public BaseScenario
 {

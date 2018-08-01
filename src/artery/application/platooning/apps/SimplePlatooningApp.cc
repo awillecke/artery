@@ -15,13 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/apps/SimplePlatooningApp.h"
+#include "artery/application/platooning/apps/SimplePlatooningApp.h"
 
-#include "veins/modules/messages/WaveShortMessage_m.h"
-#include "veins/base/messages/MacPkt_m.h"
-#include "veins/modules/mac/ieee80211p/Mac1609_4.h"
-
-#include "veins/modules/application/platooning/protocols/BaseProtocol.h"
+#include "artery/application/platooning/protocols/BaseProtocol.h"
 
 Define_Module(SimplePlatooningApp);
 
@@ -33,12 +29,7 @@ void SimplePlatooningApp::finish() {
 	BaseApp::finish();
 }
 
-void SimplePlatooningApp::onData(WaveShortMessage *wsm) {
-}
-
 void SimplePlatooningApp::handleSelfMsg(cMessage *msg) {
 	BaseApp::handleSelfMsg(msg);
 }
 
-void SimplePlatooningApp::onBeacon(WaveShortMessage* wsm) {
-}

@@ -15,7 +15,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/scenarios/SinusoidalScenario.h"
+#include "artery/application/platooning/scenarios/SinusoidalScenario.h"
 
 Define_Module(SinusoidalScenario);
 
@@ -44,12 +44,12 @@ void SinusoidalScenario::initialize(int stage) {
 				scheduleAt(startOscillating, changeSpeed);
 			}
 			//set base cruising speed
-			traciVehicle->setCruiseControlDesiredSpeed(leaderSpeed);
+			service->setCruiseControlDesiredSpeed(leaderSpeed);
 		}
 		else {
 			//let the follower set a higher desired speed to stay connected
 			//to the leader when it is accelerating
-			traciVehicle->setCruiseControlDesiredSpeed(leaderSpeed + 2 * oscillationAmplitude);
+			service->setCruiseControlDesiredSpeed(leaderSpeed + 2 * oscillationAmplitude);
 		}
 
 	}
@@ -65,7 +65,7 @@ void SinusoidalScenario::finish() {
 void SinusoidalScenario::handleSelfMsg(cMessage *msg) {
 	BaseScenario::handleSelfMsg(msg);
 	if (msg == changeSpeed) {
-		traciVehicle->setCruiseControlDesiredSpeed(
+		service->setCruiseControlDesiredSpeed(
 		    leaderSpeed +
 		    oscillationAmplitude *
 		    sin(2 * M_PI * (simTime() - startOscillating).dbl() * leaderOscillationFrequency)

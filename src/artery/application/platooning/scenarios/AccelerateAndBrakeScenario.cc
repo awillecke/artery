@@ -15,7 +15,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/scenarios/AccelerateAndBrakeScenario.h"
+#include "artery/application/platooning/scenarios/AccelerateAndBrakeScenario.h"
 
 Define_Module(AccelerateAndBrakeScenario);
 
@@ -44,9 +44,9 @@ void AccelerateAndBrakeScenario::initialize(int stage) {
 		startBrakingMsg = new cMessage("startBrakingMsg");
 
 		//enable ACC
-		traciVehicle->setActiveController(Plexe::ACC);
+		service->setActiveController(Plexe::ACC);
 		//let the vehicle start from standstill
-		traciVehicle->setFixedAcceleration(1, -8);
+		service->setFixedAcceleration(1, -8);
 
 		//schedule messages
 		scheduleAt(startAccelerating, startAccelerationMsg);
@@ -67,7 +67,7 @@ void AccelerateAndBrakeScenario::finish() {
 void AccelerateAndBrakeScenario::handleSelfMsg(cMessage *msg) {
 	BaseScenario::handleSelfMsg(msg);
 	if (msg == startAccelerationMsg)
-		traciVehicle->setFixedAcceleration(1, acceleration);
+		service->setFixedAcceleration(1, acceleration);
 	if (msg == startBrakingMsg)
-		traciVehicle->setFixedAcceleration(1, -brakingDeceleration);
+		service->setFixedAcceleration(1, -brakingDeceleration);
 }

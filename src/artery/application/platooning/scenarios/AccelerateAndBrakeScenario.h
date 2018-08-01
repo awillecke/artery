@@ -18,9 +18,9 @@
 #ifndef ACCELERATEANDBRAKESCENARIO_H_
 #define ACCELERATEANDBRAKESCENARIO_H_
 
-#include "veins/modules/application/platooning/scenarios/BaseScenario.h"
+#include "artery/application/platooning/scenarios/BaseScenario.h"
 
-#include "veins/modules/application/platooning/apps/BaseApp.h"
+#include "artery/application/platooning/apps/BaseApp.h"
 
 class AccelerateAndBrakeScenario : public BaseScenario
 {

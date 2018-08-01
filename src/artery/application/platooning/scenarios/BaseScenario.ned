@@ -15,11 +15,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.scenarios;
+package artery.application.platooning.scenarios;
 
-import org.car2x.veins.base.modules.IBaseApplLayer;
+import artery.application.platooning.utilities.IPlatooningBaseModule;
 
-moduleinterface BaseScenario extends IBaseApplLayer
+moduleinterface BaseScenario extends IPlatooningBaseModule
 {
     parameters:
 

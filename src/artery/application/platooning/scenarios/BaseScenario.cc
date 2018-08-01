@@ -15,13 +15,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/scenarios/BaseScenario.h"
+#include "artery/application/platooning/scenarios/BaseScenario.h"
 
 Define_Module(BaseScenario);
 
 void BaseScenario::initialize(int stage) {
 
-	BaseApplLayer::initialize(stage);
+	PlatooningBaseModule::initialize(stage);
 
 	if (stage == 0) {
 		accHeadway = par("accHeadway").doubleValue();
@@ -61,29 +61,26 @@ void BaseScenario::initialize(int stage) {
 	}
 
 	if (stage == 1) {
-		mobility = Veins::TraCIMobilityAccess().get(getParentModule());
-		traci = mobility->getCommandInterface();
-		traciVehicle = mobility->getVehicleCommandInterface();
 		positionHelper = FindModule<BasePositionHelper*>::findSubModule(getParentModule());
 		initializeControllers();
 
 		//set the active controller
 		if (positionHelper->isLeader()) {
-			traciVehicle->setActiveController(Plexe::ACC);
-			traciVehicle->setACCHeadwayTime(leaderHeadway);
+			service->setActiveController(Plexe::ACC);
+			service->setACCHeadwayTime(leaderHeadway);
 		}
 		else {
-			traciVehicle->setActiveController(controller);
-			traciVehicle->setACCHeadwayTime(accHeadway);
+			service->setActiveController(controller);
+			service->setACCHeadwayTime(accHeadway);
 		}
 		//set the current lane
-		traciVehicle->setFixedLane(positionHelper->getPlatoonLane());
+		service->setFixedLane(positionHelper->getPlatoonLane());
 	}
 
 }
 
 void BaseScenario::finish() {
-	BaseApplLayer::finish();
+	PlatooningBaseModule::finish();
 }
 
 void BaseScenario::handleSelfMsg(cMessage *msg) {
@@ -91,20 +88,20 @@ void BaseScenario::handleSelfMsg(cMessage *msg) {
 
 void BaseScenario::initializeControllers() {
 	//engine lag
-	traciVehicle->setGenericInformation(CC_SET_ENGINE_TAU, &engineTau, sizeof(double));
+	service->setGenericInformation(CC_SET_ENGINE_TAU, &engineTau, sizeof(double));
 	//PATH's CACC parameters
-	traciVehicle->setGenericInformation(CC_SET_CACC_C1, &caccC1, sizeof(double));
-	traciVehicle->setGenericInformation(CC_SET_CACC_OMEGA_N, &caccOmegaN, sizeof(double));
-	traciVehicle->setGenericInformation(CC_SET_CACC_XI, &caccXi, sizeof(double));
+	service->setGenericInformation(CC_SET_CACC_C1, &caccC1, sizeof(double));
+	service->setGenericInformation(CC_SET_CACC_OMEGA_N, &caccOmegaN, sizeof(double));
+	service->setGenericInformation(CC_SET_CACC_XI, &caccXi, sizeof(double));
 	//Ploeg's parameters
-	traciVehicle->setGenericInformation(CC_SET_PLOEG_H, &ploegH, sizeof(double));
-	traciVehicle->setGenericInformation(CC_SET_PLOEG_KP, &ploegKp, sizeof(double));
-	traciVehicle->setGenericInformation(CC_SET_PLOEG_KD, &ploegKd, sizeof(double));
+	service->setGenericInformation(CC_SET_PLOEG_H, &ploegH, sizeof(double));
+	service->setGenericInformation(CC_SET_PLOEG_KP, &ploegKp, sizeof(double));
+	service->setGenericInformation(CC_SET_PLOEG_KD, &ploegKd, sizeof(double));
 	//consensus parameters
 	int position = positionHelper->getPosition();
-	traciVehicle->setGenericInformation(CC_SET_VEHICLE_POSITION, &position, sizeof(int));
+	service->setGenericInformation(CC_SET_VEHICLE_POSITION, &position, sizeof(int));
 	int nCars = positionHelper->getPlatoonSize();
-	traciVehicle->setGenericInformation(CC_SET_PLATOON_SIZE, &nCars, sizeof(int));
+	service->setGenericInformation(CC_SET_PLATOON_SIZE, &nCars, sizeof(int));
 
 	Plexe::VEHICLE_DATA vehicleData;
 	//initialize own vehicle data
@@ -119,17 +116,17 @@ void BaseScenario::initializeControllers() {
 		vehicleData.positionY = 0;
 		vehicleData.speed = 200;
 		vehicleData.time = simTime().dbl();
-		traciVehicle->setGenericInformation(CC_SET_VEHICLE_DATA, &vehicleData, sizeof(struct Plexe::VEHICLE_DATA));
+		service->setGenericInformation(CC_SET_VEHICLE_DATA, &vehicleData, sizeof(struct Plexe::VEHICLE_DATA));
 	}
 
 	if (useRealisticEngine) {
 		int engineModel = CC_ENGINE_MODEL_REALISTIC;
 		//the order is important
 		//1. let sumo instantiate the realistic engine model
-		traciVehicle->setGenericInformation(CC_SET_VEHICLE_ENGINE_MODEL, &engineModel, sizeof(engineModel));
+		service->setGenericInformation(CC_SET_VEHICLE_ENGINE_MODEL, &engineModel, sizeof(engineModel));
 		//2. tell the realistic engine model the location of the parameters file
-		traciVehicle->setGenericInformation(CC_SET_VEHICLES_FILE, vehicleFile.c_str(), vehicleFile.length() + 1);
+		service->setGenericInformation(CC_SET_VEHICLES_FILE, vehicleFile.c_str(), vehicleFile.length() + 1);
 		//3. tell the realistic engine model which vehicle (in the specified parameters file) to use
-		traciVehicle->setGenericInformation(CC_SET_VEHICLE_MODEL, vehicleType.c_str(), vehicleType.length() + 1);
+		service->setGenericInformation(CC_SET_VEHICLE_MODEL, vehicleType.c_str(), vehicleType.length() + 1);
 	}
 }

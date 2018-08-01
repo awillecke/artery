@@ -19,18 +19,9 @@ package artery.application.platooning.scenarios;
 
 import artery.application.platooning.scenarios.BaseScenario;
 
-simple SinusoidalScenario like BaseScenario
+simple SimpleScenario like BaseScenario
 {
     parameters:
-
-        //oscillation frequency
-        double leaderOscillationFrequency @unit("Hz") = default(0.2Hz);
-        //oscillation ampliture
-        double oscillationAmplitude @unit("kmph") = default(10kmph);
-        //average speed
-        double leaderSpeed @unit("kmph") = default(100kmph);
-        //start oscillation at time
-        double startOscillating @unit("s") = default(5s);
 
         //base scenario inherited parameters
         //controller used by followers
@@ -56,10 +47,8 @@ simple SinusoidalScenario like BaseScenario
         //vehicle type for the realistic engine model
         string vehicleType = default("");
 
-        int headerLength @unit("bit") = default(0bit);
-
         @display("i=block/app2");
-        @class(SinusoidalScenario);
+        @class(SimpleScenario);
 
     gates:
         input lowerLayerIn; // from network layer

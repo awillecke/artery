@@ -15,9 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.apps;
+package artery.application.platooning.apps;
 
-import org.car2x.veins.modules.application.platooning.apps.BaseApp;
+import artery.application.platooning.apps.BaseApp;
 
 simple SimplePlatooningApp like BaseApp
 {

@@ -15,13 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/apps/BaseApp.h"
+#include "artery/application/platooning/apps/BaseApp.h"
 
-#include "veins/modules/messages/WaveShortMessage_m.h"
-#include "veins/base/messages/MacPkt_m.h"
-#include "veins/modules/mac/ieee80211p/Mac1609_4.h"
-
-#include "veins/modules/application/platooning/protocols/BaseProtocol.h"
+#include "artery/application/platooning/protocols/BaseProtocol.h"
 
 bool BaseApp::crashHappened = false;
 bool BaseApp::simulationCompleted = false;
@@ -30,7 +26,7 @@ Define_Module(BaseApp);
 
 void BaseApp::initialize(int stage) {
 
-	BaseApplLayer::initialize(stage);
+	PlatooningBaseModule::initialize(stage);
 
 	if (stage == 0) {
 		//when to stop simulation (after communications started)
@@ -53,9 +49,7 @@ void BaseApp::initialize(int stage) {
 	}
 
 	if (stage == 1) {
-		mobility = Veins::TraCIMobilityAccess().get(getParentModule());
-		traci = mobility->getCommandInterface();
-		traciVehicle = mobility->getVehicleCommandInterface();
+
 		positionHelper = FindModule<BasePositionHelper*>::findSubModule(getParentModule());
 		protocol = FindModule<BaseProtocol*>::findSubModule(getParentModule());
 		myId = positionHelper->getId();
@@ -72,7 +66,7 @@ void BaseApp::initialize(int stage) {
 }
 
 void BaseApp::finish() {
-	BaseApplLayer::finish();
+	PlatooningBaseModule::finish();
 	if (recordData) {
 		if (recordData->isScheduled()) {
 			cancelEvent(recordData);
@@ -80,13 +74,14 @@ void BaseApp::finish() {
 		delete recordData;
 		recordData = 0;
 	}
-	if (!crashHappened && !simulationCompleted) {
-		if (traciVehicle->isCrashed()) {
-			crashHappened = true;
-			logVehicleData(true);
-			endSimulation();
-		}
-	}
+	//TODO: here, the vehilce in sumo is already destroyed, hence traci call failes!
+	//if (!crashHappened && !simulationCompleted) {
+	//	if (service->isCrashed()) {
+	//		crashHappened = true;
+	//		logVehicleData(true);
+	//		endSimulation();
+	//	}
+	//}
 }
 
 void BaseApp::handleLowerMsg(cMessage *msg) {
@@ -106,11 +101,11 @@ void BaseApp::handleLowerMsg(cMessage *msg) {
 
 			//if the message comes from the leader
 			if (epkt->getVehicleId() == positionHelper->getLeaderId()) {
-				traciVehicle->setPlatoonLeaderData(epkt->getSpeed(), epkt->getAcceleration(), epkt->getPositionX(), epkt->getPositionY(), epkt->getTime());
+				service->setPlatoonLeaderData(epkt->getSpeed(), epkt->getAcceleration(), epkt->getPositionX(), epkt->getPositionY(), epkt->getTime());
 			}
 			//if the message comes from the vehicle in front
 			if (epkt->getVehicleId() == positionHelper->getFrontId()) {
-				traciVehicle->setPrecedingVehicleData(epkt->getSpeed(), epkt->getAcceleration(), epkt->getPositionX(), epkt->getPositionY(), epkt->getTime());
+				service->setPrecedingVehicleData(epkt->getSpeed(), epkt->getAcceleration(), epkt->getPositionX(), epkt->getPositionY(), epkt->getTime());
 			}
 			//send data about every vehicle to the CACC. this is needed by the consensus controller
 			struct Plexe::VEHICLE_DATA vehicleData;
@@ -123,7 +118,7 @@ void BaseApp::handleLowerMsg(cMessage *msg) {
 			vehicleData.speed = epkt->getSpeed();
 			vehicleData.time = epkt->getTime();
 			//send information to CACC
-			traciVehicle->setGenericInformation(CC_SET_VEHICLE_DATA, &vehicleData, sizeof(struct Plexe::VEHICLE_DATA));
+			service->setGenericInformation(CC_SET_VEHICLE_DATA, &vehicleData, sizeof(struct Plexe::VEHICLE_DATA));
 
 		}
 
@@ -137,8 +132,8 @@ void BaseApp::handleLowerMsg(cMessage *msg) {
 void BaseApp::logVehicleData(bool crashed) {
 	//get distance and relative speed w.r.t. front vehicle
 	double distance, relSpeed, acceleration, speed, controllerAcceleration, posX, posY, time;
-	traciVehicle->getRadarMeasurements(distance, relSpeed);
-	traciVehicle->getVehicleData(speed, acceleration, controllerAcceleration, posX, posY, time);
+	service->getRadarMeasurements(distance, relSpeed);
+	service->getVehicleData(speed, acceleration, controllerAcceleration, posX, posY, time);
 	if (crashed)
 		distance = 0;
 	//write data to output files
@@ -147,17 +142,14 @@ void BaseApp::logVehicleData(bool crashed) {
 	nodeIdOut.record(myId);
 	accelerationOut.record(acceleration);
 	controllerAccelerationOut.record(controllerAcceleration);
-	speedOut.record(mobility->getCurrentSpeed().x);
-	Coord pos = mobility->getPositionAt(simTime());
-	posxOut.record(pos.x);
-	posyOut.record(pos.y);
+	speedOut.record(service->getCurrentSpeed());
+	Position pos = service->getCurrentPosition();
+	posxOut.record(static_cast<double>(pos.x.value()));
+	posyOut.record(static_cast<double>(pos.y.value()));
 }
 
 void BaseApp::handleLowerControl(cMessage *msg) {
 	delete msg;
-}
-
-void BaseApp::onData(WaveShortMessage *wsm) {
 }
 
 void BaseApp::sendUnicast(cPacket *msg, int destination) {
@@ -184,5 +176,3 @@ void BaseApp::stopSimulation() {
 	endSimulation();
 }
 
-void BaseApp::onBeacon(WaveShortMessage* wsm) {
-}

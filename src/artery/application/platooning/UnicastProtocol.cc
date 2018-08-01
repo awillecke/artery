@@ -15,18 +15,18 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/UnicastProtocol.h"
+#include "artery/application/platooning/UnicastProtocol.h"
 
 //to get recv power from lower layer
-#include "veins/base/phyLayer/PhyToMacControlInfo.h"
-#include "veins/modules/phy/DeciderResult80211.h"
+//#include "veins/base/phyLayer/PhyToMacControlInfo.h"
+//#include "veins/modules/phy/DeciderResult80211.h"
 
 Define_Module(UnicastProtocol);
 
 void UnicastProtocol::initialize(int stage)
 {
 
-	BaseWaveApplLayer::initialize(stage);
+	PlatooningBaseModule::initialize(stage);
 
 	if (stage == 0)
 	{
@@ -121,7 +121,7 @@ void UnicastProtocol::handleUpperControl(cMessage *msg)
 
 }
 
-void UnicastProtocol::sendMessageDown(int destination, cPacket *msg, int encapsulatedId, int priority, SimTime timestamp, enum Channels::ChannelNumber channel, short kind)
+void UnicastProtocol::sendMessageDown(int destination, cPacket *msg, int encapsulatedId, int priority, SimTime timestamp, short kind)
 {
 
 	//this function cannot be called if we are still waiting for the ack
@@ -145,23 +145,14 @@ void UnicastProtocol::sendMessageDown(int destination, cPacket *msg, int encapsu
 	unicast->setPriority(priority);
 	unicast->setTimestamp(timestamp);
 	unicast->setKind(kind);
-	unicast->setChannel(channel);
+	unicast->setChannel(0);
 	//encapsulate message. NOTICE that we are encapsulating the message directly
 	//decapsulated from the message coming from the application. we could use
 	//msg->dup(), but then, since msg has been decapsulated, we would have to
 	//free it
 	unicast->encapsulate(msg);
 
-	WaveShortMessage *wsm = new WaveShortMessage();
-	populateWSM(wsm, 0, unicast->getSequenceNumber());
-	wsm->setChannelNumber(channel);
-	wsm->setUserPriority(priority);
-	wsm->encapsulate(unicast);
-	//include control info that might have been set at higher layers
-	if (msg->getControlInfo()){
-		wsm->setControlInfo(msg->getControlInfo()->dup());
-	}
-	sendDown(wsm);
+	sendDown(unicast);
 
 	//TODO: check whether to leave this here or somewhere else
 	//if we are sending a unicast packet, schedule ack timeout
@@ -192,24 +183,14 @@ void UnicastProtocol::sendAck(const UnicastMessage *msg)
 	unicast->setChannel(msg->getChannel());
 	unicast->setType(ACK);
 
-	WaveShortMessage *wsm = new WaveShortMessage();
-	populateWSM(wsm, 0, msg->getSequenceNumber());
-	wsm->setChannelNumber(msg->getChannel());
-	wsm->setUserPriority(msg->getPriority());
-	wsm->encapsulate(unicast);
-	sendDown(wsm);
+	sendDown(unicast);
 
 }
 
 void UnicastProtocol::resendMessage()
 {
 
-	WaveShortMessage *wsm = new WaveShortMessage();
-	populateWSM(wsm, 0, currentMsg->getSequenceNumber());
-	wsm->setChannelNumber(currentMsg->getChannel());
-	wsm->setUserPriority(currentMsg->getPriority());
-	wsm->encapsulate(currentMsg->dup());
-	sendDown(wsm);
+	sendDown(currentMsg->dup());
 
 	scheduleAt(simTime() + SimTime(ackTimeout), timeout);
 	nAttempts++;
@@ -284,7 +265,7 @@ void UnicastProtocol::handleAckMessage(const UnicastMessage *ack)
 	if (currentMsg == 0)
 	{
 		//we have received an ack we were not waiting for. do nothing
-		DBG_APP << "unexpected ACK";
+		EV_DEBUG << "unexpected ACK";
 	}
 	else
 	{
@@ -316,22 +297,11 @@ void UnicastProtocol::handleAckMessage(const UnicastMessage *ack)
 
 void UnicastProtocol::handleLowerMsg(cMessage *msg)
 {
-	//first try to get the WSM out
-	WaveShortMessage *wsm = dynamic_cast<WaveShortMessage *>(msg);
-	ASSERT2(wsm, "expecting a WSM but something different received");
-
-	//then get our unicast message out
-	UnicastMessage *unicast = dynamic_cast<UnicastMessage *>(wsm->decapsulate());
+	// get our unicast message out
+	UnicastMessage *unicast = dynamic_cast<UnicastMessage *>(msg);
 	ASSERT2(unicast, "no unicast message inside the WSM message");
 
-	//pass up also received power information
-	PhyToMacControlInfo *ctlInfo = dynamic_cast<PhyToMacControlInfo *>(wsm->getControlInfo());
-	ASSERT2(ctlInfo, "no control info into mac packet");
-	DeciderResult80211 *res = dynamic_cast<DeciderResult80211 *>(ctlInfo->getDeciderResult());
-	ASSERT2(res, "no decider result into control info");
-	unicast->setRecvPower_dBm(res->getRecvPower_dBm());
-
-	delete wsm;
+	//TODO: pass up also received power information
 
 	double r = dblrand();
 	if (r < packetLossRate) {
@@ -407,19 +377,16 @@ void UnicastProtocol::processNextPacket()
 	UnicastMessage *toSend = queue.front();
 
 	//send message down
-	sendMessageDown(toSend->getDestination(), toSend->decapsulate(), toSend->getEncapsulationId(), toSend->getPriority(), toSend->getTimestamp(), (enum Channels::ChannelNumber)toSend->getChannel(), toSend->getKind());
+	sendMessageDown(toSend->getDestination(), toSend->decapsulate(), toSend->getEncapsulationId(), toSend->getPriority(), toSend->getTimestamp(), toSend->getKind());
 
 	delete toSend;
 
 }
 
-void UnicastProtocol::onBeacon(WaveShortMessage* wsm)
+void UnicastProtocol::publicHandleLowerMsg(cMessage *msg)
 {
-	ASSERT2(0, "onBeacon invoke when handleLowerMsg() has been overridden");
-}
-void UnicastProtocol::onData(WaveShortMessage* wsm)
-{
-	ASSERT2(0, "onData invoke when handleLowerMsg() has been overridden");
+    Enter_Method("publicHandleLowerMsg");
+    handleLowerMsg(msg->dup());
 }
 
 void UnicastProtocol::finish()
@@ -428,7 +395,7 @@ void UnicastProtocol::finish()
 		cancelAndDelete(timeout);
 		timeout = 0;
 	}
-	BaseWaveApplLayer::finish();
+	PlatooningBaseModule::finish();
 }
 
 UnicastProtocol::UnicastProtocol()

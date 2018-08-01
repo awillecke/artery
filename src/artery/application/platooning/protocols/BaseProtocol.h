@@ -18,25 +18,23 @@
 #ifndef BASEPROTOCOL_H_
 #define BASEPROTOCOL_H_
 
-#include "veins/base/modules/BaseApplLayer.h"
+#include "artery/application/platooning/utilities/PlatooningBaseModule.h"
 
-#include "veins/modules/application/platooning/UnicastProtocol.h"
-#include "veins/modules/application/platooning/messages/PlatooningBeacon_m.h"
+#include "artery/application/platooning/UnicastProtocol.h"
+#include "artery/application/platooning/messages/PlatooningBeacon_m.h"
 
-#include "veins/modules/mobility/traci/TraCIMobility.h"
-
-#include "veins/modules/application/platooning/utilities/BasePositionHelper.h"
+#include "artery/application/platooning/utilities/BasePositionHelper.h"
 
 //maximum number of upper layer apps that can connect (see .ned file)
 #define MAX_GATES_COUNT 10
 
-class BaseProtocol : public BaseApplLayer {
+class BaseProtocol : public PlatooningBaseModule {
 
 	private:
 
 		//signals for busy channel and collisions
-		static const simsignalwrap_t sigChannelBusy;
-		static const simsignalwrap_t sigCollision;
+		static const simsignal_t sigChannelBusy;
+		static const simsignal_t sigCollision;
 
 		//amount of time channel has been observed busy during the last "statisticsPeriod" seconds
 		SimTime busyTime;
@@ -161,11 +159,6 @@ class BaseProtocol : public BaseApplLayer {
 		virtual void channelBusyStart() {}
 		virtual void channelIdleStart() {}
 		virtual void collision() {}
-
-		//traci mobility. used for getting/setting info about the car
-		Veins::TraCIMobility *mobility;
-		Veins::TraCICommandInterface *traci;
-		Veins::TraCICommandInterface::Vehicle *traciVehicle;
 
 	public:
 

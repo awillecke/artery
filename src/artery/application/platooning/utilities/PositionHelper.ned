@@ -15,9 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.utilities;
+package artery.application.platooning.utilities;
 
-import org.car2x.veins.modules.application.platooning.utilities.BasePositionHelper;
+import artery.application.platooning.utilities.BasePositionHelper;
 
 simple PositionHelper like BasePositionHelper
 {
