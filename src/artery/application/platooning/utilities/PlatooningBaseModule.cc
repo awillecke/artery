@@ -30,6 +30,10 @@ void PlatooningBaseModule::initialize(int stage)
 		upperControlOut = findGate("upperControlOut");
 		lowerControlIn = findGate("lowerControlIn");
 		lowerControlOut = findGate("lowerControlOut");
+
+		//get parent for TraCI API wrapper functions
+		service = dynamic_cast<PlatooningService*>(getParentModule());
+		ASSERT2(service, "Platooning service not found!");
 	}
 }
 
@@ -77,19 +81,19 @@ void PlatooningBaseModule::handleMessage(cMessage* msg)
 
 void PlatooningBaseModule::sendDown(cMessage *msg)
 {
-//    recordPacket(PassedMessage::OUTGOING,PassedMessage::LOWER_DATA,msg);
+	//recordPacket(PassedMessage::OUTGOING,PassedMessage::LOWER_DATA,msg);
 	send(msg, lowerLayerOut);
 }
 
 void PlatooningBaseModule::sendUp(cMessage *msg)
 {
-//    recordPacket(PassedMessage::OUTGOING,PassedMessage::UPPER_DATA,msg);
+	//recordPacket(PassedMessage::OUTGOING,PassedMessage::UPPER_DATA,msg);
 	send(msg, upperLayerOut);
 }
 
 void PlatooningBaseModule::sendControlUp(cMessage *msg)
 {
-//    recordPacket(PassedMessage::OUTGOING,PassedMessage::UPPER_CONTROL,msg);
+	//recordPacket(PassedMessage::OUTGOING,PassedMessage::UPPER_CONTROL,msg);
 	if (gate(upperControlOut)->isPathOK())
 		send(msg, upperControlOut);
 	else {
@@ -100,7 +104,7 @@ void PlatooningBaseModule::sendControlUp(cMessage *msg)
 
 void PlatooningBaseModule::sendControlDown(cMessage *msg)
 {
-//    recordPacket(PassedMessage::OUTGOING,PassedMessage::LOWER_CONTROL,msg);
+	//recordPacket(PassedMessage::OUTGOING,PassedMessage::LOWER_CONTROL,msg);
 	if (gate(lowerControlOut)->isPathOK())
 		send(msg, lowerControlOut);
 	else {

@@ -18,8 +18,11 @@
 #ifndef PLATOONING_BASE_MODULE_H
 #define PLATOONING_BASE_MODULE_H
 
+#include "artery/application/platooning/PlatooningService.h"
+
 #include <omnetpp.h>
 #include <omnetpp/csimplemodule.h>
+#include <omnetpp/clistener.h>
 #include <assert.h>
 
 using namespace omnetpp;
@@ -30,7 +33,7 @@ using namespace omnetpp;
 *  by the BaseApplLayer and IBaseApplLayer classes, which Plexe modules
 *  inherited from.
 */
-class PlatooningBaseModule : public cSimpleModule
+class PlatooningBaseModule : public cSimpleModule, public cListener
 {
 
 	protected:
@@ -47,9 +50,22 @@ class PlatooningBaseModule : public cSimpleModule
 		int lowerControlOut;
 		/*@}*/
 
+
+		// using parent module to wrap calls to TraCI API
+		PlatooningService *service;
+
 	public:
 		PlatooningBaseModule()
 		{
+			upperLayerIn = -1;
+			upperLayerOut = -1;
+			lowerLayerIn = -1;
+			lowerLayerOut = -1;
+			upperControlIn = -1;
+			upperControlOut = -1;
+			lowerControlIn = -1;
+			lowerControlOut = -1;
+			service = 0;
 		}
 
 		/** @brief Initialization of the module and some variables*/
