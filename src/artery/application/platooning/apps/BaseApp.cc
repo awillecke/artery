@@ -98,7 +98,6 @@ void BaseApp::handleLowerMsg(cMessage *msg) {
 		ASSERT2(epkt, "received UnicastMessage does not contain a PlatooningBeacon");
 
 		if (positionHelper->isInSamePlatoon(epkt->getVehicleId())) {
-
 			//if the message comes from the leader
 			if (epkt->getVehicleId() == positionHelper->getLeaderId()) {
 				service->setPlatoonLeaderData(epkt->getSpeed(), epkt->getAcceleration(), epkt->getPositionX(), epkt->getPositionY(), epkt->getTime());
@@ -143,9 +142,9 @@ void BaseApp::logVehicleData(bool crashed) {
 	accelerationOut.record(acceleration);
 	controllerAccelerationOut.record(controllerAcceleration);
 	speedOut.record(service->getCurrentSpeed());
-	Position pos = service->getCurrentPosition();
-	posxOut.record(static_cast<double>(pos.x.value()));
-	posyOut.record(static_cast<double>(pos.y.value()));
+	libsumo::TraCIPosition pos = service->getPosition();
+	posxOut.record(pos.x);
+	posyOut.record(pos.y);
 }
 
 void BaseApp::handleLowerControl(cMessage *msg) {

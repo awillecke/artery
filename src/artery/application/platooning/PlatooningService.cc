@@ -297,10 +297,11 @@ double PlatooningService::getCurrentSpeed()
 	return mVehicleDataProvider->speed().value();
 }
 
-Position PlatooningService::getCurrentPosition()
+libsumo::TraCIPosition PlatooningService::getPosition()
 {
 	Enter_Method("getCurrentPosition");
-	return mVehicleDataProvider->position();
+	auto& vehicle = getFacilities().get_const<traci::VehicleController>();
+	return vehicle.getLiteAPI().vehicle().getPosition(vehicleId);
 }
 
 std::string PlatooningService::getVehicleId()

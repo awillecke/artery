@@ -157,7 +157,7 @@ void BaseProtocol::sendPlatooningMessage(int destinationAddress) {
 	//get information about the vehicle via traci
 	service->getVehicleData(speed, acceleration, controllerAcceleration, sumoPosX, sumoPosY, sumoTime);
 	//get current vehicle position
-	Position position = service->getCurrentPosition();
+	libsumo::TraCIPosition position = service->getPosition();
 
 	double veinsTime = simTime().dbl();
 	double time = veinsTime;
@@ -178,8 +178,8 @@ void BaseProtocol::sendPlatooningMessage(int destinationAddress) {
 	}
 	pkt->setSpeed(speed);
 	pkt->setVehicleId(myId);
-	pkt->setPositionX(position.x.value());
-	pkt->setPositionY(position.y.value());
+	pkt->setPositionX(position.x);
+	pkt->setPositionY(position.y);
 	//set the time to now
 	pkt->setTime(time);
 	//i generated the message, i send it

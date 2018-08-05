@@ -74,7 +74,7 @@ class PlatooningService : public ItsG5Service
 
 		double getCurrentSpeed();
 
-		Position getCurrentPosition();
+		libsumo::TraCIPosition getPosition();
 
 		std::string getVehicleId();
 
