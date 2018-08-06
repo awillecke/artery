@@ -1,1 +1,0 @@
-add_opp_run(platooning CONFIG omnetpp.ini)
