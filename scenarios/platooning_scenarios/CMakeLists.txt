@@ -1,0 +1,1 @@
+add_opp_run(platooning_scenarios CONFIG omnetpp.ini)
