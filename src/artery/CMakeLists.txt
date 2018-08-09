@@ -25,6 +25,7 @@ add_library(core SHARED
     netw/GeoNetPacketWrapper.cc
     nic/RadioDriverBase.cc
     traci/MobilityBase.cc
+    traci/TraCIBaseTrafficManager.cc
     traci/VehicleController.cc
     traci/VehicleType.cc
     utility/AsioScheduler.cc

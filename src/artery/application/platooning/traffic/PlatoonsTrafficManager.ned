@@ -15,9 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.traffic;
+package artery.application.platooning.traffic;
 
-import org.car2x.veins.modules.mobility.traci.TraCIBaseTrafficManager;
+import artery.traci.TraCIBaseTrafficManager;
 
 simple PlatoonsTrafficManager like TraCIBaseTrafficManager {
 
