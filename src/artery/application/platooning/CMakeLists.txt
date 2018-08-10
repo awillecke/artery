@@ -16,6 +16,8 @@ target_sources(platooningservice PRIVATE
     scenarios/BrakingScenario.cc
     scenarios/SimpleScenario.cc
     scenarios/SinusoidalScenario.cc
+    traffic/PlatoonsPlusHumanTraffic.cc
+    traffic/PlatoonsTrafficManager.cc
     utilities/PositionHelper.cc
     utilities/BasePositionHelper.cc
     utilities/PlatooningBaseModule.cc
