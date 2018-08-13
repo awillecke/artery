@@ -8,6 +8,7 @@ add_artery_feature(platooningservice)
 target_sources(platooningservice PRIVATE
     apps/BaseApp.cc
     apps/SimplePlatooningApp.cc
+    maneuver/JoinManeuverScenario.cc
     protocols/BaseProtocol.cc
     protocols/SimplePlatooningBeaconing.cc
     protocols/SlottedBeaconing.cc
@@ -16,16 +17,19 @@ target_sources(platooningservice PRIVATE
     scenarios/BrakingScenario.cc
     scenarios/SimpleScenario.cc
     scenarios/SinusoidalScenario.cc
+    traffic/JoinTrafficManager.cc
     traffic/PlatoonsPlusHumanTraffic.cc
     traffic/PlatoonsTrafficManager.cc
     utilities/PositionHelper.cc
     utilities/BasePositionHelper.cc
+    utilities/JoinPositionHelper.cc
     utilities/PlatooningBaseModule.cc
     PlatooningService.cc
     UnicastProtocol.cc
 )
 
 generate_opp_message(messages/InterferingBeacon.msg TARGET platooningservice)
+generate_opp_message(messages/ManeuverMessage.msg TARGET platooningservice)
 generate_opp_message(messages/PlatooningBeacon.msg TARGET platooningservice)
 generate_opp_message(messages/UnicastMessage.msg TARGET platooningservice)
 generate_opp_message(messages/UnicastProtocolControlMessage.msg TARGET platooningservice)

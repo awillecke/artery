@@ -15,9 +15,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package org.car2x.veins.modules.application.platooning.maneuver;
+package artery.application.platooning.maneuver;
 
-import org.car2x.veins.modules.application.platooning.scenarios.BaseScenario;
+import artery.application.platooning.scenarios.BaseScenario;
 
 simple JoinManeuverScenario like BaseScenario
 {

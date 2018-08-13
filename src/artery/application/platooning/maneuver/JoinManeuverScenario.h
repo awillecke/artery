@@ -18,10 +18,12 @@
 #ifndef JOINMANEUVERSCENARIO_H_
 #define JOINMANEUVERSCENARIO_H_
 
-#include "veins/modules/application/platooning/scenarios/BaseScenario.h"
-#include "veins/modules/application/platooning/protocols/BaseProtocol.h"
+#include "artery/application/platooning/scenarios/BaseScenario.h"
+#include "artery/application/platooning/protocols/BaseProtocol.h"
 
-#include "veins/modules/application/platooning/messages/ManeuverMessage_m.h"
+#include "artery/application/platooning/messages/ManeuverMessage_m.h"
+
+#include "inet/common/geometry/common/Coord.h"
 
 class JoinManeuverScenario : public BaseScenario
 {

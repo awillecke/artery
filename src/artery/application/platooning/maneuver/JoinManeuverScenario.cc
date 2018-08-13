@@ -15,7 +15,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/maneuver/JoinManeuverScenario.h"
+#include "artery/application/platooning/maneuver/JoinManeuverScenario.h"
 
 Define_Module(JoinManeuverScenario);
 
@@ -56,9 +56,9 @@ void JoinManeuverScenario::prepareManeuverCars(int platoonLane) {
 
 		case 0: {
 			//this is the leader
-			traciVehicle->setCruiseControlDesiredSpeed(100.0 / 3.6);
-			traciVehicle->setActiveController(Plexe::ACC);
-			traciVehicle->setFixedLane(platoonLane);
+			service->setCruiseControlDesiredSpeed(100.0 / 3.6);
+			service->setActiveController(Plexe::ACC);
+			service->setFixedLane(platoonLane);
 			role = LEADER;
 
 			positionHelper->setLeaderId(positionHelper->getId());
@@ -80,9 +80,9 @@ void JoinManeuverScenario::prepareManeuverCars(int platoonLane) {
 		case 2:
 		case 3: {
 			//these are the followers which are already in the platoon
-			traciVehicle->setCruiseControlDesiredSpeed(130.0 / 3.6);
-			traciVehicle->setActiveController(Plexe::CACC);
-			traciVehicle->setFixedLane(platoonLane);
+			service->setCruiseControlDesiredSpeed(130.0 / 3.6);
+			service->setActiveController(Plexe::CACC);
+			service->setFixedLane(platoonLane);
 			role = FOLLOWER;
 
 			positionHelper->setLeaderId(0);
@@ -103,9 +103,9 @@ void JoinManeuverScenario::prepareManeuverCars(int platoonLane) {
 
 		case 4: {
 			//this is the car which will join
-			traciVehicle->setCruiseControlDesiredSpeed(100/3.6);
-			traciVehicle->setFixedLane(2);
-			traciVehicle->setActiveController(Plexe::ACC);
+			service->setCruiseControlDesiredSpeed(100/3.6);
+			service->setFixedLane(2);
+			service->setActiveController(Plexe::ACC);
 			role = JOINER;
 
 			//we assume leader and platoon id to be known, as it is the one we want to join
@@ -177,7 +177,7 @@ void JoinManeuverScenario::handleLowerMsg(cMessage *msg) {
 void JoinManeuverScenario::sendUnicast(cPacket *msg, int destination) {
 	UnicastMessage *unicast = new UnicastMessage("", MANEUVER_TYPE);
 	unicast->setDestination(destination);
-	unicast->setChannel(Channels::CCH);
+	unicast->setChannel(0);
 	unicast->encapsulate(msg);
 	sendDown(unicast);
 }
@@ -327,18 +327,18 @@ void JoinManeuverScenario::handleJoinerMsg(cMessage *msg) {
 					vehicleData.joinLane = maneuver->getPlatoonLane();
 
 					//check for correct lane. if not in correct lane, change it
-					int currentLane = traciVehicle->getLaneIndex();
+					int currentLane = service->getLaneIndex();
 					if (currentLane != vehicleData.joinLane) {
-						traciVehicle->setFixedLane(vehicleData.joinLane);
+						service->setFixedLane(vehicleData.joinLane);
 					}
 
 					//activate faked CACC. this way we can approach the front car using data obtained through GPS
-					traciVehicle->setCACCConstantSpacing(15);
+					service->setCACCConstantSpacing(15);
 					//we have no data so far, so for the moment just initialize with some fake data
-					traciVehicle->setControllerFakeData(15, vehicleData.speed, 0, vehicleData.speed, 0);
+					service->setControllerFakeData(15, vehicleData.speed, 0, vehicleData.speed, 0);
 					//set a CC speed higher than the platoon speed to approach it
-					traciVehicle->setCruiseControlDesiredSpeed(vehicleData.speed + 30/3.6);
-					traciVehicle->setActiveController(Plexe::FAKED_CACC);
+					service->setCruiseControlDesiredSpeed(vehicleData.speed + 30/3.6);
+					service->setActiveController(Plexe::FAKED_CACC);
 					FSM_Goto(joinerFsm, JS_MOVE_IN_POSITION);
 				}
 
@@ -351,10 +351,10 @@ void JoinManeuverScenario::handleJoinerMsg(cMessage *msg) {
 			//if we get data, just feed the fake CACC
 			if (beacon && beacon->getVehicleId() == positionHelper->getFrontId()) {
 				//get front vehicle position
-				Coord frontPosition(beacon->getPositionX(), beacon->getPositionY(), 0);
+				inet::Coord frontPosition(beacon->getPositionX(), beacon->getPositionY(), 0);
 				//get my position
-				Veins::TraCICoord traciPosition = mobility->getManager()->omnet2traci(mobility->getCurrentPosition());
-				Coord position(traciPosition.x, traciPosition.y);
+				libsumo::TraCIPosition traciPosition = service->getPosition();
+				inet::Coord position(traciPosition.x, traciPosition.y);
 				//compute distance (-4 because of vehicle length)
 				double distance = position.distance(frontPosition) - 4;
 				//if we are in position, tell the leader about that
@@ -374,9 +374,9 @@ void JoinManeuverScenario::handleJoinerMsg(cMessage *msg) {
 
 				//if we get confirmation from the leader, switch from faked CACC to real CACC
 				if (maneuver->getMessageType() == LM_JOIN_PLATOON) {
-					traciVehicle->setActiveController(Plexe::CACC);
+					service->setActiveController(Plexe::CACC);
 					//set spacing to 5 meters to get close to the platoon
-					traciVehicle->setCACCConstantSpacing(5);
+					service->setCACCConstantSpacing(5);
 				}
 				//tell the leader that we're now in the platoon
 				toSend = generateMessage();

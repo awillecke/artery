@@ -18,7 +18,7 @@
 #ifndef JOINTRAFFICMANAGER_H_
 #define JOINTRAFFICMANAGER_H_
 
-#include <veins/modules/application/platooning/traffic/PlatoonsTrafficManager.h>
+#include <artery/application/platooning/traffic/PlatoonsTrafficManager.h>
 
 class JoinTrafficManager : public PlatoonsTrafficManager
 {

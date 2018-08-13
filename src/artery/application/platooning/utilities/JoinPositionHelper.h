@@ -18,7 +18,7 @@
 #ifndef JOINPOSITIONHELPER_H_
 #define JOINPOSITIONHELPER_H_
 
-#include "veins/modules/application/platooning/utilities/BasePositionHelper.h"
+#include "artery/application/platooning/utilities/BasePositionHelper.h"
 
 class JoinPositionHelper : public BasePositionHelper
 {

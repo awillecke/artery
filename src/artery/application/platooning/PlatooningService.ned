@@ -29,8 +29,6 @@ module PlatooningService like artery.application.ItsG5Service
         string appl_type;
         string protocol_type;
 
-        //duration of simulation
-        double simulationDuration @unit("s");
         @display("i=block/app2;bgb=318.15,132.3");
 
 
