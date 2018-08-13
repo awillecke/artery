@@ -94,7 +94,7 @@ void PlatooningBaseModule::sendUp(cMessage *msg)
 void PlatooningBaseModule::sendControlUp(cMessage *msg)
 {
 	//recordPacket(PassedMessage::OUTGOING,PassedMessage::UPPER_CONTROL,msg);
-	if (gate(upperControlOut)->isPathOK())
+	if (gate(upperControlOut)->isConnectedOutside())
 		send(msg, upperControlOut);
 	else {
 		EV << "BaseLayer: upperControlOut is not connected; dropping message" << std::endl;
@@ -105,7 +105,7 @@ void PlatooningBaseModule::sendControlUp(cMessage *msg)
 void PlatooningBaseModule::sendControlDown(cMessage *msg)
 {
 	//recordPacket(PassedMessage::OUTGOING,PassedMessage::LOWER_CONTROL,msg);
-	if (gate(lowerControlOut)->isPathOK())
+	if (gate(lowerControlOut)->isConnectedOutside())
 		send(msg, lowerControlOut);
 	else {
 		EV << "BaseLayer: lowerControlOut is not connected; dropping message" << std::endl;
