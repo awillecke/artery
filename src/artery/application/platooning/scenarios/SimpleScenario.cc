@@ -35,6 +35,12 @@ void SimpleScenario::initialize(int stage) {
 		}
 		EV_INFO << "\n";
 
+		//set the active controller
+		if (positionHelper->isLeader()) {
+			service->setActiveController(Plexe::DRIVER);
+			service->setACCHeadwayTime(leaderHeadway);
+		}
+
 	}
 
 }
