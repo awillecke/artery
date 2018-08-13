@@ -170,7 +170,7 @@ void BaseProtocol::sendPlatooningMessage(int destinationAddress) {
 
 	//create platooning beacon with data about the car
 	pkt = new PlatooningBeacon();
-	if (useControllerAcceleration) {
+	if (service->getActiveController() != Plexe::DRIVER) {
 		pkt->setAcceleration(controllerAcceleration);
 	}
 	else {
