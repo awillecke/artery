@@ -15,7 +15,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "veins/modules/application/platooning/utilities/JoinPositionHelper.h"
+#include "artery/application/platooning/utilities/JoinPositionHelper.h"
 
 Define_Module(JoinPositionHelper);
 
