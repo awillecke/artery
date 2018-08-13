@@ -8,7 +8,7 @@
     <service type="artery.application.platooning.PlatooningService">
         <listener port="4001" />
         <filters>
-            <name pattern="auto_flow0.*" />
+            <name pattern="vtypeauto.*" />
         </filters>
     </service>
 </services>
