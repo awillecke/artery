@@ -129,6 +129,13 @@ unsigned int PlatooningService::getLanesCount()
 	return vehicle.getLiteAPI().vehicle().getLanesCount(vehicleId);
 }
 
+int PlatooningService::getLaneIndex()
+{
+	Enter_Method("getLaneIndex");
+	auto& vehicle = getFacilities().get_const<traci::VehicleController>();
+	return vehicle.getLiteAPI().vehicle().getLaneIndex(vehicleId);
+}
+
 void PlatooningService::setPlatoonLeaderData(double leaderSpeed, double leaderAcceleration, double positionX,
 		double positionY, double time)
 {

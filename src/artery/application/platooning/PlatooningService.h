@@ -46,6 +46,7 @@ class PlatooningService : public ItsG5Service
 		 * For more information, see http://plexe.car2x.org/api/
 		 * */
 		unsigned int getLanesCount();
+		int getLaneIndex();
 		void setPlatoonLeaderData(double leaderSpeed, double leaderAcceleration, double positionX, double positionY,
 				double time);
 		void setPrecedingVehicleData(double speed, double acceleration, double positionX, double positionY, double time);
