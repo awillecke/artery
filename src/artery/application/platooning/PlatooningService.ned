@@ -29,7 +29,7 @@ module PlatooningService like artery.application.ItsG5Service
         string appl_type;
         string protocol_type;
 
-        @display("i=block/app2;bgb=318.15,132.3");
+        @display("i=block/app2;bgb=214.88,131.92");
 
 
     gates:
@@ -38,19 +38,19 @@ module PlatooningService like artery.application.ItsG5Service
     submodules:
 
         helper: <helper_type> like artery.application.platooning.utilities.BasePositionHelper {
-            @display("p=104.72,90.44");
+            @display("p=174.76,27.2");
         }
 
         scenario: <scenario_type> like artery.application.platooning.scenarios.BaseScenario {
-            @display("p=179.52,27.2");
-        }
-
-        appl: <appl_type> like artery.application.platooning.apps.BaseApp {
             @display("p=104.72,27.2");
         }
 
+        appl: <appl_type> like artery.application.platooning.apps.BaseApp {
+            @display("p=34.68,27.2");
+        }
+
         prot: <protocol_type> like artery.application.platooning.protocols.BaseProtocol {
-            @display("p=35.28,27.72");
+            @display("p=104.72,90.44");
         }
 
         unicast: artery.application.platooning.UnicastProtocol {
