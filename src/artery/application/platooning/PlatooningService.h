@@ -72,6 +72,7 @@ class PlatooningService : public ItsG5Service
 		double getDistanceToRouteEnd();
 		double getDistanceFromRouteBegin();
 		double getACCAcceleration();
+		int getSignalStates();
 
 		double getCurrentSpeed();
 

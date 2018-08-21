@@ -2215,6 +2215,11 @@ TraCIAPI::VehicleScope::getDistance(const std::string& vehicleID) const {
     return myParent.getDouble(CMD_GET_VEHICLE_VARIABLE, VAR_DISTANCE, vehicleID);
 }
 
+int
+TraCIAPI::VehicleScope::getSignalStates(const std::string& vehicleID) const {
+	return myParent.getInt(CMD_GET_VEHICLE_VARIABLE, VAR_SIGNALS, vehicleID);
+}
+
 double
 TraCIAPI::VehicleScope::getLateralLanePosition(const std::string& vehicleID) const {
     return myParent.getDouble(CMD_GET_VEHICLE_VARIABLE, VAR_LANEPOSITION_LAT, vehicleID);

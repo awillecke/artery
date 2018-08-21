@@ -53,6 +53,7 @@ void PlatooningService::indicate(const btp::DataIndication& ind, cPacket* packet
 void PlatooningService::initialize()
 {
 	ItsG5Service::initialize();
+
 	m_self_msg = new cMessage("Platooning Service");
 	subscribe(scSignalUnicastReceived);
 
@@ -296,6 +297,13 @@ double PlatooningService::getACCAcceleration()
 	Enter_Method("getACCAcceleration");
 	auto& vehicle = getFacilities().get_const<traci::VehicleController>();
 	return vehicle.getLiteAPI().vehicle().getACCAcceleration(vehicleId);
+}
+
+int PlatooningService::getSignalStates()
+{
+	Enter_Method("getSignalStates");
+	auto& vehicle = getFacilities().get_const<traci::VehicleController>();
+	return vehicle.getLiteAPI().vehicle().getSignalStates(vehicleId);
 }
 
 double PlatooningService::getCurrentSpeed()
