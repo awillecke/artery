@@ -17,5 +17,6 @@ simple TurnTrafficManager like TraCIBaseTrafficManager {
         int lane;
         //sumo vehicle type for platooning cars
         string platooningVType;
+        string insertRoute;
         @class(TurnTrafficManager);
 }
