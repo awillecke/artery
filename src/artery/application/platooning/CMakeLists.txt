@@ -9,6 +9,7 @@ target_sources(platooningservice PRIVATE
     apps/BaseApp.cc
     apps/SimplePlatooningApp.cc
     maneuver/JoinManeuverScenario.cc
+    maneuver/TurnManeuverScenario.cc
     protocols/BaseProtocol.cc
     protocols/SimplePlatooningBeaconing.cc
     protocols/SlottedBeaconing.cc
@@ -18,6 +19,7 @@ target_sources(platooningservice PRIVATE
     scenarios/SimpleScenario.cc
     scenarios/SinusoidalScenario.cc
     traffic/JoinTrafficManager.cc
+    traffic/TurnTrafficManager.cc
     traffic/PlatoonsPlusHumanTraffic.cc
     traffic/PlatoonsTrafficManager.cc
     utilities/PositionHelper.cc
@@ -30,6 +32,7 @@ target_sources(platooningservice PRIVATE
 
 generate_opp_message(messages/InterferingBeacon.msg TARGET platooningservice)
 generate_opp_message(messages/ManeuverMessage.msg TARGET platooningservice)
+generate_opp_message(messages/TurnManeuverMessage.msg TARGET platooningservice)
 generate_opp_message(messages/PlatooningBeacon.msg TARGET platooningservice)
 generate_opp_message(messages/UnicastMessage.msg TARGET platooningservice)
 generate_opp_message(messages/UnicastProtocolControlMessage.msg TARGET platooningservice)
