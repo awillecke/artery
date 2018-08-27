@@ -79,13 +79,20 @@ void UnicastProtocol::handleUpperMsg(cMessage *msg)
 		return;
 	}
 
-	//save packet into queue
-	queue.push(unicast);
-	//if the packet we just inserted is the only one in the queue
-	//then tell the protocol to immediately process it
-	if (queue.size() == 1)
-	{
-		processNextPacket();
+	if (unicast->getDestination() != -1) {
+		//save packet into queue
+		queue.push(unicast);
+		//if the packet we just inserted is the only one in the queue
+		//then tell the protocol to immediately process it
+		if (queue.size() == 1)
+		{
+			processNextPacket();
+		}
+	}
+	else {
+		//send message down directly
+		sendMessageDown(unicast->getDestination(), unicast->decapsulate(), unicast->getEncapsulationId(), unicast->getPriority(), unicast->getTimestamp(), unicast->getKind());
+		delete unicast;
 	}
 
 }
@@ -126,7 +133,10 @@ void UnicastProtocol::sendMessageDown(int destination, cPacket *msg, int encapsu
 
 	//this function cannot be called if we are still waiting for the ack
 	//for another packet. this unicast protocol is simple, nothing like TCP
-	ASSERT2(currentMsg == 0, "trying to send a message while still waiting for the ack of another");
+	if (currentMsg != 0 && destination != -1) {
+		EV_INFO << "Still waiting for ACK, and Message is no broadcast!\n";
+		return;
+	}
 
 	UnicastMessage *unicast = new UnicastMessage("unicast");
 
@@ -134,7 +144,12 @@ void UnicastProtocol::sendMessageDown(int destination, cPacket *msg, int encapsu
 	unicast->setSource(macAddress);
 	unicast->setDestination(destination);
 	//NOTICE: autoincrementing the sequence number
-	unicast->setSequenceNumber(sequenceNumber++);
+	if (destination == -1) {
+		unicast->setSequenceNumber(-1);
+	}
+	else {
+		unicast->setSequenceNumber(sequenceNumber++);
+	}
 	unicast->setType(DATA);
 	//the length of source, destination and sequence number is set to 0 because
 	//these are actually fields which are present at the mac layer. this unicast
@@ -158,14 +173,11 @@ void UnicastProtocol::sendMessageDown(int destination, cPacket *msg, int encapsu
 	//if we are sending a unicast packet, schedule ack timeout
 	if (destination != -1)
 	{
+		EV_INFO << "send seq " << unicast->getSequenceNumber() << " to " << unicast->getDestination() << "\n";
+
 		currentMsg = unicast->dup();
 		nAttempts = 0;
 		scheduleAt(simTime() + SimTime(ackTimeout), timeout);
-	}
-	//if we are sending a broadcast, delete the packet from the queue
-	else
-	{
-		queue.pop();
 	}
 
 }
@@ -183,16 +195,18 @@ void UnicastProtocol::sendAck(const UnicastMessage *msg)
 	unicast->setChannel(msg->getChannel());
 	unicast->setType(ACK);
 
+	EV_INFO << "send ACK for " << msg->getSequenceNumber() << "\n";
+
 	sendDown(unicast);
 
 }
 
 void UnicastProtocol::resendMessage()
 {
-
+	EV_INFO << "resend attempt " << nAttempts << ": " << currentMsg->getSource() << " -> " << currentMsg->getDestination() << " with seq " << currentMsg->getSequenceNumber() << "\n";
 	sendDown(currentMsg->dup());
 
-	scheduleAt(simTime() + SimTime(ackTimeout), timeout);
+	scheduleAt(simTime() + SimTime(ackTimeout + ackTimeout * nAttempts), timeout);
 	nAttempts++;
 }
 
@@ -211,6 +225,7 @@ void UnicastProtocol::handleUnicastMessage(const UnicastMessage *msg)
 	{
 
 		//message is directed to this node
+		EV_INFO << "message for node, seq " << msg->getSequenceNumber() << "\n";
 
 		//first of all check whether this is a duplicate
 		sequenceNumberIt = receiveSequenceNumbers.find(source);
@@ -222,6 +237,7 @@ void UnicastProtocol::handleUnicastMessage(const UnicastMessage *msg)
 
 		if (msg->getSequenceNumber() >= expectedSequenceNumber)
 		{
+			EV_INFO << "expectedSequenceNumber, wanted " << expectedSequenceNumber << " or higher\n";
 			//we have never seen this message, we have to send it up to to the application
 			//notice that we do not decapsulate, because the upper layer may want to know
 			//the sender address, so we just pass up the entire frame
@@ -259,13 +275,14 @@ void UnicastProtocol::handleAckMessage(const UnicastMessage *ack)
 	//if ack is not directed to this node, just drop it
 	if (ack->getDestination() != macAddress)
 	{
+		EV_INFO << "got ACK for node " << ack->getDestination() << "\n";
 		return;
 	}
 
 	if (currentMsg == 0)
 	{
 		//we have received an ack we were not waiting for. do nothing
-		EV_DEBUG << "unexpected ACK";
+		EV_INFO << "unexpected ACK from " << ack->getSource() << " to " << ack->getDestination() << " with seq " << ack->getSequenceNumber() << "\n";
 	}
 	else
 	{
@@ -278,13 +295,16 @@ void UnicastProtocol::handleAckMessage(const UnicastMessage *ack)
 		msgSequence = currentMsg->getSequenceNumber();
 		ackSequence = ack->getSequenceNumber();
 
-		ASSERT2(msgDestination == ackSource && msgSequence == ackSequence, "received a wrong ACK");
+//		ASSERT2(msgDestination == ackSource && msgSequence == ackSequence, "received a wrong ACK");
+		EV_INFO << "got ACK for seq " << ack->getSequenceNumber() << ", current is " << msgSequence << "\n";
 
 		//we've got the ack. stop timeout timer
 		if (timeout->isScheduled())
 			cancelEvent(timeout);
 		//message has been correctly received by the destination. move on to next packet
 		queue.pop();
+
+
 		delete currentMsg;
 		currentMsg = 0;
 		nAttempts = 0;
@@ -343,7 +363,7 @@ void UnicastProtocol::handleSelfMsg(cMessage *msg)
 		}
 		else
 		{
-
+			EV_DEBUG << "maxAttempts for packet " << currentMsg->getSource() << " to " << currentMsg->getDestination() << "(" << currentMsg->getSequenceNumber() << ")\n";
 			//we tried maxAttempts time with no success. discard the
 			//message and tell the error to the application
 			UnicastProtocolControlMessage *sendError = new UnicastProtocolControlMessage("sendError");
