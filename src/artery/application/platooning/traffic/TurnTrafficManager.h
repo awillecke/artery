@@ -25,6 +25,9 @@ class TurnTrafficManager : public TraCIBaseTrafficManager
 		double insertCarInterval;
 		std::string platooningVType;
 
+		std::string insertRoute;
+		int insertRouteId;
+
 		cMessage *insertVehilceMessage;
 
 		//vehicles to be inserted

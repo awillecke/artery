@@ -16,6 +16,8 @@ void TurnTrafficManager::initialize(int stage) {
 		insertCarInterval = par("insertCarInterval").doubleValue();
 		platooningVType = par("platooningVType").stdstringValue();
 
+		insertRoute = par("insertRoute").stdstringValue();
+
 		insertVehilceMessage = new cMessage("");
 		scheduleAt(insertTime, insertVehilceMessage);
 
@@ -43,10 +45,18 @@ void TurnTrafficManager::scenarioLoaded() {
 	automated.lane = lane;
 	automated.position = 0;
 	automated.speed = insertSpeed/3.6;
+
+	std::list<std::string> routes = getRouteIds();
+	for (std::list<std::string>::iterator i = routes.begin(); i != routes.end(); ++i) {
+		std::string routeId = *i;
+		if (routeId == insertRoute) {
+			insertRouteId = std::distance(routes.begin(), i);
+		}
+	}
 }
 
 void TurnTrafficManager::insertVehicle() {
-	addVehicleToQueue(0, automated);
+	addVehicleToQueue(insertRouteId, automated);
 	nCarsInserted++;
 }
 
