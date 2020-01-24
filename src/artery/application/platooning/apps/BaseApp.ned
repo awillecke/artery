@@ -23,7 +23,7 @@ moduleinterface BaseApp extends IPlatooningBaseModule
 {
     parameters:
         //duration of simulation
-        double simulationDuration @unit("s");
+        int simulationDuration @unit("s");
 
         @display("i=block/app2");
         @class(BaseApp);

@@ -24,7 +24,7 @@ simple SimplePlatooningApp like BaseApp
     parameters:
         int headerLength @unit("bit") = default(0 bit);
         //duration of simulation
-        double simulationDuration @unit("s");
+        int simulationDuration @unit("s");
 
         @display("i=block/app2");
         @class(SimplePlatooningApp);
