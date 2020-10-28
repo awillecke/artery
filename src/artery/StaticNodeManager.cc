@@ -6,6 +6,7 @@
 
 #include "artery/StaticNodeManager.h"
 #include "artery/inet/AntennaMobility.h"
+#include "artery/networking/StationaryPositionProvider.h"
 #include "artery/utility/InitStages.h"
 
 namespace artery
@@ -169,6 +170,23 @@ void StaticNodeManager::addRoadSideUnit(const std::string& id)
 
     rsuModule->scheduleStart(simTime());
     rsuModule->callInitialize();
+
+    int numRadios =  rsuModule->par("numRadios").intValue();
+    for (int i = 0; i < numRadios; i++) {
+
+        auto* vanetzaModule = rsuModule->getSubmodule("vanetza", i);
+        if (!vanetzaModule) {
+            error("vanetza module not found!");
+        }
+
+        auto* positionProvider = dynamic_cast<artery::StationaryPositionProvider*>(vanetzaModule->getSubmodule("position"));
+        if (positionProvider) {
+            positionProvider->initializePosition(pos);
+        } else {
+            error("missing position module");
+        }
+    }
+
     emit(addRoadSideUnitSignal, id.c_str(), rsuModule);
 }
 
